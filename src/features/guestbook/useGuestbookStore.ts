@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { getApiUrl } from '@/config/api';
 
 export interface GuestbookEntry {
   id: string;
@@ -30,7 +31,7 @@ export const useGuestbookStore = create<GuestbookStoreState>((set) => ({
   fetchEntries: async () => {
     set({ isLoading: true, error: null });
     try {
-      const res = await fetch('/api/guestbook').catch(() => null);
+      const res = await fetch(getApiUrl('/api/guestbook')).catch(() => null);
       if (res && res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) set({ entries: data });
@@ -66,7 +67,7 @@ export const useGuestbookStore = create<GuestbookStoreState>((set) => ({
     };
 
     try {
-      const response = await fetch('/api/guestbook', {
+      const response = await fetch(getApiUrl('/api/guestbook'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newEntry),

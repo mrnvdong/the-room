@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import { useGameStore } from '@/stores/useGameStore';
 import { useMultiplayerStore, RemotePlayer } from '@/stores/useMultiplayerStore';
 import { localAvatarState } from '@/game/avatarState';
+import { getWebSocketUrl } from '@/config/api';
 
 export const MultiplayerSync: React.FC = () => {
   const myClientId = useMultiplayerStore((state) => state.myClientId);
@@ -72,8 +73,7 @@ export const MultiplayerSync: React.FC = () => {
 
     const connectWebSocket = () => {
       try {
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${protocol}//${window.location.host}/ws-presence`;
+        const wsUrl = getWebSocketUrl();
         const ws = new WebSocket(wsUrl);
 
         ws.onopen = () => {
