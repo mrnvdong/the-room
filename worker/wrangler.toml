@@ -10,7 +10,7 @@ bindings = [
 
 [[migrations]]
 tag = "v1"
-new_classes = ["PresenceRoom"]
+new_sqlite_classes = ["PresenceRoom"]
 
 # Optional Cloudflare D1 Database binding:
 # Run: npx wrangler d1 create the-room-db
