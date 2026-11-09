@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && cd dist && git init && git checkout -B gh-pages && git add -A && git commit -m 'deploy: GitHub Pages live build' && git remote add origin https://github.com/mrnvdong/the-room.git && git push -u origin gh-pages --force && rm -rf .git && cd .."
   },
   "dependencies": {
     "@react-three/drei": "^9.121.4",
