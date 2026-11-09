@@ -1,6 +1,9 @@
 # THE ROOM
 
-THE ROOM is a local interactive 3D portfolio prototype built with React, TypeScript, Vite, Three.js, React Three Fiber, Drei, and Zustand. The configured owner name is DONG. Biography, career, contact, project, skill, achievement, infrastructure, and guestbook content is either absent or visibly marked as demo data.
+THE ROOM is an interactive 3D portfolio built with React, TypeScript, Vite, Three.js, React Three Fiber, Drei, and Zustand. The configured owner name is DONG.
+
+- **Live GitHub Pages Demo**: [https://mrnvdong.github.io/the-room/](https://mrnvdong.github.io/the-room/)
+- **GitHub Repository**: [https://github.com/mrnvdong/the-room](https://github.com/mrnvdong/the-room)
 
 ## Current implementation
 
@@ -19,13 +22,14 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-## Checks
+## Checks & Deployment
 
 ```bash
 npm run typecheck
 npm run lint
 npm test
 npm run build
+npm run deploy    # Rebuilds and deploys to GitHub Pages (gh-pages branch)
 ```
 
 Playwright scripts in `scripts/` are manual suites. They are not all included in `npm test`; see `TEST_REPORT.md` for verified coverage and limits.
