@@ -18,7 +18,7 @@ const Turntable: React.FC<{ identity: VisitorIdentity }> = ({ identity }) => {
   });
 
   return (
-    <group ref={groupRef} position={[0, -0.95, 0]}>
+    <group ref={groupRef} position={[0, -0.85, 0]}>
       <AvatarModel identity={identity} isTurntablePreview />
     </group>
   );
@@ -28,7 +28,7 @@ export const AvatarPreview: React.FC<AvatarPreviewProps> = ({ identity }) => {
   return (
     <div className="w-full h-56 rounded-2xl bg-slate-900 border border-white/10 overflow-hidden relative shadow-inner">
       <Canvas
-        camera={{ position: [0, 0.35, 2.7], fov: 42 }}
+        camera={{ position: [0, 0.1, 2.6], fov: 42 }}
         gl={{ antialias: true, alpha: true, powerPreference: 'default' }}
         onCreated={({ gl }) => {
           gl.domElement.addEventListener(
