@@ -30,7 +30,7 @@ export const MODEL_URL = getAssetUrl('models/xbot.glb');
 try {
   useGLTF.preload(MODEL_URL);
 } catch {
-  // Ignore preload error on offline/isolated environments
+  // Ignore preload error on offline environments
 }
 
 // Helper to determine role color palettes
@@ -49,7 +49,7 @@ function getIdentityPalette(identity: VisitorIdentity) {
     visorScreenColor = 0xef4444; // Crimson Red Tie accent
     visorEmissive = 0xb91c1c;
     earColor = 0x475569;
-    hairColor = 0x1f2937; // Dark sleek hair
+    hairColor = 0x1f2937;
     frameColor = 0x334155;
   } else if (identity === 'partner') {
     bodyColor = 0x065f46; // Emerald Green
@@ -105,7 +105,7 @@ function getIdentityPalette(identity: VisitorIdentity) {
 }
 
 /**
- * 1. REAL RIGGED GLB SKINNEDMESH AVATAR
+ * 1. REAL RIGGED GLB SKINNEDMESH AVATAR WITH FULL KINEMATICS ENGINE
  */
 const GLBAvatar: React.FC<AvatarModelProps> = ({
   identity,
@@ -113,6 +113,7 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
   isRunning = false,
   isTurntablePreview = false,
   currentAction = null,
+  actionStartTime = 0,
   isSitting = false,
 }) => {
   const groupRef = useRef<THREE.Group>(null);
@@ -313,27 +314,109 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
     return clone;
   }, [scene, palette, identity]);
 
+  // Cache bone references for high-performance kinematic posing
+  const bones = useMemo(() => {
+    return {
+      hips: clonedScene.getObjectByName('mixamorigHips') as THREE.Bone,
+      spine: clonedScene.getObjectByName('mixamorigSpine') as THREE.Bone,
+      head: clonedScene.getObjectByName('mixamorigHead') as THREE.Bone,
+      leftArm: clonedScene.getObjectByName('mixamorigLeftArm') as THREE.Bone,
+      leftForeArm: clonedScene.getObjectByName('mixamorigLeftForeArm') as THREE.Bone,
+      leftHand: clonedScene.getObjectByName('mixamorigLeftHand') as THREE.Bone,
+      rightArm: clonedScene.getObjectByName('mixamorigRightArm') as THREE.Bone,
+      rightForeArm: clonedScene.getObjectByName('mixamorigRightForeArm') as THREE.Bone,
+      rightHand: clonedScene.getObjectByName('mixamorigRightHand') as THREE.Bone,
+      leftUpLeg: clonedScene.getObjectByName('mixamorigLeftUpLeg') as THREE.Bone,
+      leftLeg: clonedScene.getObjectByName('mixamorigLeftLeg') as THREE.Bone,
+      rightUpLeg: clonedScene.getObjectByName('mixamorigRightUpLeg') as THREE.Bone,
+      rightLeg: clonedScene.getObjectByName('mixamorigRightLeg') as THREE.Bone,
+    };
+  }, [clonedScene]);
+
+  // Attach and cache Action Props to skeleton hands and head
+  const propsRefs = useMemo(() => {
+    const rightHand = bones.rightHand;
+    const leftHand = bones.leftHand;
+    const head = bones.head;
+
+    // 1. Coffee cup
+    const cup = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.035, 0.025, 0.08, 16),
+      new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 })
+    );
+    cup.scale.setScalar(100);
+    cup.position.set(0, 6, 4);
+    cup.visible = false;
+    rightHand?.add(cup);
+
+    // 2. Smartphone with Camera Flash
+    const phone = new THREE.Group();
+    phone.scale.setScalar(100);
+    phone.position.set(0, 6, 4);
+    const phoneBody = new THREE.Mesh(
+      new THREE.BoxGeometry(0.07, 0.12, 0.008),
+      new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 })
+    );
+    const phoneScreen = new THREE.Mesh(
+      new THREE.BoxGeometry(0.062, 0.11, 0.002),
+      new THREE.MeshBasicMaterial({ color: 0x38bdf8 })
+    );
+    phoneScreen.position.z = 0.005;
+    const flashLight = new THREE.PointLight(0xffffff, 0, 4);
+    flashLight.position.set(0, 0.04, -0.02);
+    phone.add(phoneBody, phoneScreen, flashLight);
+    phone.visible = false;
+    rightHand?.add(phone);
+
+    // 3. CV Portfolio Folder
+    const cv = new THREE.Group();
+    cv.scale.setScalar(100);
+    cv.position.set(0, 8, 4);
+    const folder = new THREE.Mesh(
+      new THREE.BoxGeometry(0.18, 0.24, 0.015),
+      new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.5 })
+    );
+    const paper = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.15, 0.21),
+      new THREE.MeshBasicMaterial({ color: 0xf8fafc, side: THREE.DoubleSide })
+    );
+    paper.position.z = 0.01;
+    cv.add(folder, paper);
+    cv.visible = false;
+    leftHand?.add(cv);
+
+    // 4. Laser Scan Beam
+    const laser = new THREE.Group();
+    laser.scale.setScalar(100);
+    laser.position.set(0, 11, 18);
+    const beam = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.004, 0.004, 2.0, 8),
+      new THREE.MeshBasicMaterial({ color: 0xef4444 })
+    );
+    beam.rotation.x = Math.PI / 2;
+    beam.position.z = 1.0;
+    laser.add(beam);
+    laser.visible = false;
+    head?.add(laser);
+
+    return { cup, phone, flashLight, cv, laser };
+  }, [bones]);
+
   // Hook up skeletal animation mixer
   const { actions } = useAnimations(animations, groupRef);
 
-  // Manage animation transitions smoothly
+  // Manage base animation clip transitions
   useEffect(() => {
     if (!actions) return;
 
     let targetAction = 'idle';
 
-    if (isSitting || currentAction === 'sit') {
-      targetAction = 'sneak_pose';
-    } else if (isMoving || (isTurntablePreview && Math.floor(animTimeRef.current) % 6 > 3)) {
+    if (isMoving || (isTurntablePreview && Math.floor(animTimeRef.current) % 6 > 3)) {
       targetAction = isRunning ? 'run' : 'walk';
-    } else if (currentAction === 'nod_approval' || currentAction === 'handshake') {
+    } else if (currentAction === 'nod_approval' || currentAction === 'discuss_architecture') {
       targetAction = 'agree';
-    } else if (currentAction === 'wave' || currentAction === 'high_five' || currentAction === 'cheer') {
-      targetAction = 'agree';
-    } else if (currentAction === 'think_ponder' || currentAction === 'inspect_cv') {
-      targetAction = 'sad_pose';
-    } else if (currentAction === 'dance' || currentAction === 'applause' || currentAction === 'laugh') {
-      targetAction = 'agree';
+    } else if (currentAction === 'think_ponder') {
+      targetAction = 'headShake';
     } else if (currentAction === 'sneak_crouch' || currentAction === 'inspect_vault') {
       targetAction = 'sneak_pose';
     } else {
@@ -350,22 +433,255 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
         actions[key]?.fadeOut(0.2);
       }
     });
-  }, [actions, isMoving, isRunning, isSitting, currentAction, isTurntablePreview]);
+  }, [actions, isMoving, isRunning, isTurntablePreview, currentAction]);
 
+  // Frame kinematics loop for sitting and expressive character actions
   useFrame((_, delta) => {
     animTimeRef.current += delta;
+    const t = actionStartTime > 0 ? (Date.now() - actionStartTime) / 1000 : animTimeRef.current;
+
+    // Toggle Action Props visibility
+    propsRefs.cup.visible = currentAction === 'drink_coffee';
+    propsRefs.phone.visible = currentAction === 'take_photo';
+    propsRefs.cv.visible = currentAction === 'inspect_cv';
+    propsRefs.laser.visible = currentAction === 'laser_scan';
+
+    if (currentAction === 'take_photo') {
+      propsRefs.flashLight.intensity = Math.sin(t * 8) > 0.6 ? 4.0 : 0;
+    }
+
+    // 1. SITTING POSE KINEMATICS (Chair / Sofa)
+    if (isSitting) {
+      if (bones.hips) {
+        bones.hips.position.y = 58; // cm scale
+        bones.hips.position.z = -5;
+      }
+      if (bones.leftUpLeg) bones.leftUpLeg.rotation.set(-Math.PI / 2.05, 0, -0.05);
+      if (bones.rightUpLeg) bones.rightUpLeg.rotation.set(-Math.PI / 2.05, 0, 0.05);
+      if (bones.leftLeg) bones.leftLeg.rotation.set(Math.PI / 2.05, 0, 0);
+      if (bones.rightLeg) bones.rightLeg.rotation.set(Math.PI / 2.05, 0, 0);
+      if (bones.leftArm) bones.leftArm.rotation.set(0, -0.3, -1.1);
+      if (bones.leftForeArm) bones.leftForeArm.rotation.set(0, -0.6, 0.4);
+      if (bones.rightArm) bones.rightArm.rotation.set(0, 0.3, 1.1);
+      if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.6, 0.4);
+      return;
+    }
+
+    // 2. ACTIVE ACTIONS & EMOTES KINEMATICS
+    if (currentAction && !isMoving) {
+      switch (currentAction) {
+        case 'wave': {
+          // Keep left arm resting at side
+          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
+          if (bones.leftForeArm) bones.leftForeArm.rotation.set(0, 0, 0);
+          // Raise right arm and wave forearm
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.4, -2.2);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0, -0.6 + Math.sin(t * 10) * 0.45);
+          if (bones.head) bones.head.rotation.z = Math.sin(t * 5) * 0.1;
+          break;
+        }
+
+        case 'handshake': {
+          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 1.2, 0.35 + Math.sin(t * 10) * 0.1);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.3, 0);
+          if (bones.spine) bones.spine.rotation.x = 0.08;
+          break;
+        }
+
+        case 'applause': {
+          const clap = Math.sin(t * 14) * 0.15;
+          if (bones.leftArm) bones.leftArm.rotation.set(0, -0.9 + clap, -0.4);
+          if (bones.leftForeArm) bones.leftForeArm.rotation.set(0, -0.5, -0.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.9 - clap, 0.4);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.5, -0.2);
+          break;
+        }
+
+        case 'drink_coffee': {
+          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
+          const sip = Math.sin(t * 3);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.8 + sip * 0.1, 0.3);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.6, -1.2 + sip * 0.2);
+          if (bones.head) bones.head.rotation.x = -sip * 0.12;
+          break;
+        }
+
+        case 'take_photo': {
+          if (bones.leftArm) bones.leftArm.rotation.set(0, -1.1, -0.5);
+          if (bones.leftForeArm) bones.leftForeArm.rotation.set(0, -0.6, -0.6);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 1.1, 0.5);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.6, -0.6);
+          if (bones.head) bones.head.rotation.x = 0.1;
+          break;
+        }
+
+        case 'inspect_cv': {
+          if (bones.leftArm) bones.leftArm.rotation.set(0, -0.9, -0.5);
+          if (bones.leftForeArm) bones.leftForeArm.rotation.set(0, -0.7, -0.4);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.8, 0.4);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.6 + Math.sin(t * 4) * 0.12, -0.4);
+          if (bones.head) bones.head.rotation.x = 0.35;
+          break;
+        }
+
+        case 'nod_approval': {
+          if (bones.head) bones.head.rotation.x = Math.sin(t * 8) * 0.25;
+          break;
+        }
+
+        case 'adjust_tie': {
+          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.6, 0.3);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.8, -1.3 + Math.sin(t * 8) * 0.1);
+          if (bones.head) bones.head.rotation.x = 0.15;
+          break;
+        }
+
+        case 'type_device': {
+          const typeL = Math.sin(t * 16) * 0.08;
+          const typeR = Math.cos(t * 16) * 0.08;
+          if (bones.leftArm) bones.leftArm.rotation.set(0, -1.1, -0.4);
+          if (bones.leftForeArm) bones.leftForeArm.rotation.set(0, -0.4 + typeL, -0.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 1.1, 0.4);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.4 + typeR, -0.2);
+          break;
+        }
+
+        case 'discuss_architecture': {
+          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.8 + Math.sin(t * 4) * 0.2, 0.4);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.4, -0.4);
+          break;
+        }
+
+        case 'think_ponder': {
+          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.6, 0.3);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.7, -1.4);
+          if (bones.head) bones.head.rotation.set(-0.1, 0.2, 0.15);
+          break;
+        }
+
+        case 'high_five': {
+          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.5, -2.3);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.4, -0.4);
+          break;
+        }
+
+        case 'cheer': {
+          if (bones.leftArm) bones.leftArm.rotation.set(0, -0.3, 2.3 + Math.sin(t * 8) * 0.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.3, -2.3 - Math.sin(t * 8) * 0.2);
+          if (bones.head) bones.head.rotation.x = -0.2;
+          break;
+        }
+
+        case 'look_around': {
+          if (bones.head) bones.head.rotation.y = Math.sin(t * 2) * 0.6;
+          break;
+        }
+
+        case 'laser_scan': {
+          if (bones.head) bones.head.rotation.y = Math.sin(t * 4) * 0.6;
+          break;
+        }
+
+        case 'robot_dance': {
+          const step = Math.floor(t * 4) % 4;
+          if (step === 0) {
+            if (bones.rightArm) bones.rightArm.rotation.set(0, 1.4, 0);
+            if (bones.leftArm) bones.leftArm.rotation.set(0, 0, 1.4);
+          } else if (step === 1) {
+            if (bones.rightArm) bones.rightArm.rotation.set(0, 0, -1.4);
+            if (bones.leftArm) bones.leftArm.rotation.set(0, -1.4, 0);
+          } else if (step === 2) {
+            if (bones.rightArm) bones.rightArm.rotation.set(0, 0.5, -2.0);
+            if (bones.leftArm) bones.leftArm.rotation.set(0, -0.5, 0.8);
+          } else {
+            if (bones.rightArm) bones.rightArm.rotation.set(0, 0, 1.15);
+            if (bones.leftArm) bones.leftArm.rotation.set(0, -0.5, -2.0);
+          }
+          break;
+        }
+
+        case 'dance': {
+          const sway = Math.sin(t * 8);
+          if (bones.hips) bones.hips.position.x = sway * 5;
+          if (bones.leftArm) bones.leftArm.rotation.set(0, -0.8 + Math.cos(t * 8) * 0.4, -0.6);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.8 - Math.cos(t * 8) * 0.4, 0.6);
+          break;
+        }
+
+        case 'laugh': {
+          const bounce = Math.sin(t * 16) * 0.05;
+          if (bones.spine) bones.spine.rotation.x = -0.15 + bounce;
+          if (bones.head) bones.head.rotation.x = -0.2 + bounce * 2;
+          if (bones.leftArm) bones.leftArm.rotation.set(0, -0.4, -0.9);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.4, 0.9);
+          break;
+        }
+
+        case 'spooky_boo': {
+          if (bones.hips) bones.hips.position.y = 104 + Math.sin(t * 6) * 12;
+          if (bones.leftArm) bones.leftArm.rotation.set(0, -1.2, -0.4 + Math.sin(t * 8) * 0.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 1.2, 0.4 - Math.sin(t * 8) * 0.2);
+          break;
+        }
+
+        case 'twirl_float': {
+          if (bones.hips) bones.hips.position.y = 104 + Math.sin(t * 4) * 15;
+          if (groupRef.current) groupRef.current.rotation.y = t * 6;
+          break;
+        }
+
+        case 'mysterious_bow': {
+          if (bones.spine) bones.spine.rotation.x = 0.45;
+          if (bones.head) bones.head.rotation.x = 0.25;
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.6, 0.5);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.8, -1.0);
+          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
+          break;
+        }
+
+        case 'snap_fingers': {
+          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.8, 0.2);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.4, -0.6);
+          break;
+        }
+
+        case 'sneak_crouch': {
+          if (bones.hips) bones.hips.position.y = 80;
+          break;
+        }
+
+        case 'inspect_vault': {
+          if (bones.hips) bones.hips.position.y = 80;
+          if (bones.head) bones.head.rotation.y = Math.sin(t * 3) * 0.4;
+          break;
+        }
+
+        case 'blend_in':
+        case 'recharge': {
+          if (bones.head) bones.head.rotation.x = 0.25;
+          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0, 0, 1.2);
+          break;
+        }
+      }
+    }
   });
 
   return (
     <group ref={groupRef} dispose={null}>
-      <primitive object={clonedScene} scale={0.95} position={[0, isSitting ? -0.35 : 0, 0]} />
+      <primitive object={clonedScene} scale={0.95} position={[0, 0, 0]} />
     </group>
   );
 };
 
 /**
  * 2. INSTANT ZERO-LATENCY FALLBACK MESH
- * Renders immediately while GLB is downloading or if network fails, preventing any black screen.
  */
 const FallbackStylizedAvatar: React.FC<AvatarModelProps> = ({
   identity,
@@ -396,12 +712,10 @@ const FallbackStylizedAvatar: React.FC<AvatarModelProps> = ({
 
       {/* Head */}
       <group position={[0, 1.45, 0]}>
-        {/* Face */}
         <mesh position={[0, -0.04, 0]}>
           <sphereGeometry args={[0.13, 24, 24]} />
           <meshStandardMaterial color={0xffedd5} roughness={0.65} />
         </mesh>
-        {/* VR Visor */}
         <mesh position={[0, 0.02, 0.08]}>
           <boxGeometry args={[0.24, 0.11, 0.12]} />
           <meshStandardMaterial color={palette.frameColor} roughness={0.25} />
@@ -415,7 +729,6 @@ const FallbackStylizedAvatar: React.FC<AvatarModelProps> = ({
             roughness={0.1}
           />
         </mesh>
-        {/* Hair */}
         <mesh position={[0, 0.08, -0.02]}>
           <sphereGeometry args={[0.14, 16, 16]} />
           <meshStandardMaterial color={palette.hairColor} roughness={0.8} />
@@ -437,7 +750,6 @@ const FallbackStylizedAvatar: React.FC<AvatarModelProps> = ({
 
 /**
  * 3. ERROR BOUNDARY
- * Catches any potential GLTF load / decode error and falls back to stylized mesh safely.
  */
 class ModelErrorBoundary extends Component<
   { fallback: ReactNode; children: ReactNode },
@@ -453,7 +765,7 @@ class ModelErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.warn('GLBAvatar load error caught by boundary, using fallback:', error, errorInfo);
+    console.warn('GLBAvatar error caught by boundary, using fallback:', error, errorInfo);
   }
 
   render() {

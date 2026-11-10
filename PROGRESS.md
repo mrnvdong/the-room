@@ -45,6 +45,16 @@
     - Ghế công thái học Ergonomic Chair với chân sao mạ chrome 5 bánh, trụ nâng thủy lực và lưới đỡ thắt lưng.
     - Khu vực Lounge cao cấp: Sofa Scandinavian đệm vải bouclé cao cấp, bàn trà lồng đôi (đá cẩm thạch trắng Carrara + kính màu khói viền đồng thau), ly cà phê gốm thủ công, chậu cây trầu bà lá xẻ (Monstera Deliciosa) với cành lá uốn lượn tự nhiên, TV khung tranh OLED "The Frame".
     - Kệ sách kiến trúc mở với dải LED hắt từng tầng, tượng decor hình vành khuyên kim loại mạ vàng, bình gốm cắm cành hoa khô.
+  - **Character Kinematics & Expressive Actions Engine Calibration: PASS**
+    - **Mixamo Bone Coordinate Alignment:** Hiệu chỉnh chính xác hệ trục quay góc Euler cho toàn bộ xương armature (vai, cánh tay, cẳng tay, hông, cột sống, đầu):
+      - Trục Z chuẩn Mixamo: Z âm (leftArm) / Z dương (rightArm) hạ tay áp sát thân mình khi nghỉ (idle rest: `[0, 0, -1.2]` và `[0, 0, 1.2]`), loại bỏ triệt để lỗi tay bị dang ngang hình chữ T (T-pose).
+      - Trục Y chuẩn Yaw: Đưa cánh tay vươn về phía trước ngực và bắt tay (`[0, 1.2, 0.35]`).
+      - Trục X chuẩn Pitch: Cúi gập thân người và nghiêng đầu biểu cảm.
+    - **Natural Seating Posture:** Tư thế ngồi ghế làm việc / sofa / ngồi bệt được căn chỉnh tự nhiên:
+      - Hông hạ xuống cao độ chuẩn mặt ghế (`y = 58cm`), đùi gập ngang 90° (`leftUpLeg`/`rightUpLeg`), cẳng chân hạ thẳng vuông góc (`leftLeg`/`rightLeg`), hai bàn chân chạm sàn vững vàng (`y = 0.05m`).
+      - Hai cánh tay gập nhẹ xuôi theo đùi, cẳng tay đặt êm ái trên đùi (`leftArm: [0, -0.3, -1.1]`, `leftForeArm: [0, -0.6, 0.4]`).
+    - **Skeletal Clip Blending:** Tận dụng trực tiếp các clip animation mocap gốc của Mixamo (`agree`, `headShake`, `sneak_pose`, `idle`, `walk`, `run`) cho các hành động gật đầu đồng ý (`nod_approval`, `discuss_architecture`), lắc đầu suy tư (`think_ponder`), rón rén lén lút (`sneak_crouch`, `inspect_vault`).
+    - **Action Props Scaled & Attached:** Cốc cà phê sứ, điện thoại smartphone tích hợp đèn flash nhấp nháy phát quang, tập hồ sơ CV ứng viên, tia quét laser màu đỏ được định vị chuẩn xác vào lòng bàn tay và kính thực tế ảo của nhân vật.
   - Production Deployment on GitHub Pages: `https://mrnvdong.github.io/the-room/`.
 
 ## Content Integrity
