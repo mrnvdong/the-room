@@ -20,7 +20,22 @@
     - **Robot:** Quét Laser cảm biến 🔴 (`laser_scan`), Điệu nhảy Glitch Robot 🤖 (`robot_dance`), Tự sạc năng lượng 🔋 (`recharge`).
     - **Mystery:** Cúi chào quý tộc 🎩 (`mysterious_bow`), Búng tay ma thuật 🫰 (`snap_fingers`).
     - **Universal:** Vẫy tay chào 👋 (`wave`), Vỗ tay khen ngợi 👏 (`applause`), Ngồi xuống / Đứng lên 🪑 (`sit`), Cười vui vẻ 😄 (`laugh`), Nhảy ăn mừng 🕺 (`dance`).
-  - Smart Seating System: Phím `[F]` hoặc tương tác trực tiếp với Ghế bàn làm việc (Ergonomic Desk Chair) hoặc Ghế Sofa (Sectional Sofa) hoặc ngồi thư giãn tại chỗ. Tự động đứng dậy khi di chuyển WASD.
+  - Smart Seating System: Phím `[F]` hoặc tương tác trực tiếp với Ghế bàn làm việc (Ergonomic Desk Chair) hoặc Ghế Sofa (Sectional Sofa) hoặc ngồi thư giãn tại chỗ. Tự động thoát va chạm và cho phép di chuyển mượt mà ngay khi đứng dậy.
+- **Phase 6 — Architectural Visual Overhaul & Stylized 3D Character Aesthetics: PASS**
+  - **Character Redesign:** Thay thế toàn bộ hình khối hộp thô sơ dạng Lego bằng nhân vật Stylized mượt mà (Pixar/Chibi Indie Art Style): đầu bo tròn tự nhiên, mắt anime sinh động có specular catchlight & má hồng, tóc điêu khắc từng lọn có form dáng riêng, thân capsule thon thả, cánh tay/bàn tay bo khớp tự nhiên, quần ống suông và giày sneaker đế cong thời trang.
+  - **Role-Specific Wardrobe & Details:**
+    - Recruiter: Bộ suit may đo lịch lãm, cà vạt kèm kẹp vàng, tay xách vali tài liệu da bóng.
+    - Partner: Kính thực tế tăng cường AR Glowing Cyan, cầm máy tính bảng hiển thị mã code.
+    - Friend: Áo hoodie streetwear hiện đại, tai nghe over-ear quàng cổ, ly cà phê gốm nóng bốc khói.
+    - Robot: Khung vỏ hợp kim sứ trắng bo tròn, màn hình OLED gương hiển thị mắt cảm xúc Cyan, ăng-ten phát sóng nhấp nháy.
+    - Ghost / Mystery / Thief: Thiết kế áo choàng lượn sóng, mặt nạ dạ hội mạ vàng, khăn rằn ninja bay phấp phới.
+  - **Architectural Interior Design:**
+    - Hệ vách tiêu âm 28 lam gỗ sồi (Acoustic Oak Slats) chạy dọc tường sau cùng dải đèn LED hắt chân tường ấm cúng (`#f59e0b`).
+    - Sàn gỗ óc chó Parquet xương cá sang trọng với độ bóng phản xạ ánh sáng chân thực.
+    - Bàn làm việc gỗ nguyên tấm (Live-edge Walnut) kết hợp chân thép sơn tĩnh điện đen mờ, màn hình cong Ultrawide tràn viền có đèn nền bias lighting, bàn phím cơ và chuột công thái học.
+    - Ghế công thái học Ergonomic Chair với chân sao mạ chrome 5 bánh, trụ nâng thủy lực và lưới đỡ thắt lưng.
+    - Khu vực Lounge cao cấp: Sofa Scandinavian đệm vải bouclé cao cấp, bàn trà lồng đôi (đá cẩm thạch trắng Carrara + kính màu khói viền đồng thau), ly cà phê gốm thủ công, chậu cây trầu bà lá xẻ (Monstera Deliciosa) với cành lá uốn lượn tự nhiên, TV khung tranh OLED "The Frame".
+    - Kệ sách kiến trúc mở với dải LED hắt từng tầng, tượng decor hình vành khuyên kim loại mạ vàng, bình gốm cắm cành hoa khô.
   - Production Deployment on GitHub Pages: `https://mrnvdong.github.io/the-room/`.
 
 ## Content Integrity
