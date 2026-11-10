@@ -104,9 +104,11 @@ export function checkCollision(
 }
 
 /**
- * Calculates a collision-free next position using axis-sliding physics.
+ * Calculates a collision-free next position using axis-sliding physics and depenetration.
  * If moving directly to (targetX, targetZ) hits an obstacle, it tries moving
  * along only X or only Z, enabling smooth sliding alongside walls and furniture.
+ * If the starting position is already intersecting a collider (e.g. dismounting a chair),
+ * it allows moving toward open space or depenetrates immediately.
  */
 export function resolveCollision(
   currX: number,
@@ -121,10 +123,41 @@ export function resolveCollision(
     return [targetX, targetZ];
   }
 
-  // 2. Try sliding along X axis only
+  // 2. Check if current position is already intersecting (penetration recovery)
+  const isCurrPenetrating = checkCollision(currX, currZ, radius, colliders);
+  if (isCurrPenetrating) {
+    // If targetX, currZ is free, allow it
+    if (!checkCollision(targetX, currZ, radius, colliders)) {
+      return [targetX, currZ];
+    }
+    // If currX, targetZ is free, allow it
+    if (!checkCollision(currX, targetZ, radius, colliders)) {
+      return [currX, targetZ];
+    }
+
+    // Push out along movement vector to the nearest free edge
+    for (const box of colliders) {
+      if (circleIntersectsAABB(currX, currZ, radius, box)) {
+        const dx = targetX - currX;
+        const dz = targetZ - currZ;
+
+        // If trying to move along Z
+        if (Math.abs(dz) > Math.abs(dx)) {
+          if (dz > 0) return [currX, box.max[2] + radius + 0.05];
+          if (dz < 0) return [currX, box.min[2] - radius - 0.05];
+        } else {
+          // Trying to move along X
+          if (dx > 0) return [box.max[0] + radius + 0.05, currZ];
+          if (dx < 0) return [box.min[0] - radius - 0.05, currZ];
+        }
+      }
+    }
+  }
+
+  // 3. Try sliding along X axis only
   const canMoveX = !checkCollision(targetX, currZ, radius, colliders);
 
-  // 3. Try sliding along Z axis only
+  // 4. Try sliding along Z axis only
   const canMoveZ = !checkCollision(currX, targetZ, radius, colliders);
 
   if (canMoveX && !canMoveZ) {

@@ -87,4 +87,26 @@ describe('Collision System', () => {
     // Beyond radius from edge
     expect(circleIntersectsAABB(2.6, 1, 0.5, box)).toBe(false);
   });
+
+  it('recovers and depenetrates when starting inside an obstacle (e.g. standing up from chair)', () => {
+    // Inside desk_chair collider [-5.2, 0, -2.5] to [-4.2, 1.3, -1.5]
+    const currX = -4.7;
+    const currZ = -2.0;
+
+    // Moving toward open walkway along +Z (Z = -1.0)
+    const targetX = -4.7;
+    const targetZ = -1.0;
+
+    const [, resolvedZ] = resolveCollision(
+      currX,
+      currZ,
+      targetX,
+      targetZ,
+      CHARACTER_RADIUS,
+      INITIAL_COLLIDERS
+    );
+
+    // Should successfully move out towards the open walkway, not be stuck at currZ (-2.0)
+    expect(resolvedZ).toBeGreaterThan(-1.6);
+  });
 });

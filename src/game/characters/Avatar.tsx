@@ -19,6 +19,8 @@ export const Avatar: React.FC<AvatarProps> = ({ positionRef }) => {
   const { camera } = useThree();
   const groupRef = useRef<THREE.Group>(null);
   const currentRotationY = useRef(0);
+  const currentSeatTypeRef = useRef<'desk_chair' | 'sofa' | 'floor' | null>(null);
+  const wasSittingRef = useRef(false);
 
   const moveVector = useInputStore((state) => state.moveVector);
   const isRunning = useInputStore((state) => state.isRunning);
@@ -48,30 +50,76 @@ export const Avatar: React.FC<AvatarProps> = ({ positionRef }) => {
   useFrame((_, delta) => {
     if (!groupRef.current) return;
 
-    // If user starts moving while sitting, stand up automatically
-    if (isMoving && (isLocalSitting || isSittingOnSofa)) {
-      setLocalSitting(false);
-      setSittingOnSofa(false);
+    const isCurrentlySitting = isLocalSitting || isSittingOnSofa;
+
+    // Transition from Sitting -> Standing (via button F or UI toggle)
+    if (wasSittingRef.current && !isCurrentlySitting) {
+      if (currentSeatTypeRef.current === 'desk_chair') {
+        // Step back from the desk chair into the open walkway
+        positionRef.current = [-4.7, 0, -1.1];
+        currentRotationY.current = 0;
+      } else if (currentSeatTypeRef.current === 'sofa') {
+        // Step forward from the sofa into open lounge floor
+        positionRef.current = [4.5, 0, 1.2];
+        currentRotationY.current = Math.PI;
+      }
+      currentSeatTypeRef.current = null;
+      groupRef.current.position.set(
+        positionRef.current[0],
+        positionRef.current[1],
+        positionRef.current[2]
+      );
+      localAvatarState.position = positionRef.current;
+      localAvatarState.rotationY = currentRotationY.current;
     }
 
-    if (isLocalSitting || isSittingOnSofa) {
+    // If user starts moving (WASD / Joystick) while sitting, stand up automatically
+    if (isMoving && isCurrentlySitting) {
+      setLocalSitting(false);
+      setSittingOnSofa(false);
+      if (currentSeatTypeRef.current === 'desk_chair') {
+        positionRef.current = [-4.7, 0, -1.1];
+        currentRotationY.current = 0;
+      } else if (currentSeatTypeRef.current === 'sofa') {
+        positionRef.current = [4.5, 0, 1.2];
+        currentRotationY.current = Math.PI;
+      }
+      currentSeatTypeRef.current = null;
+      wasSittingRef.current = false;
+      groupRef.current.position.set(
+        positionRef.current[0],
+        positionRef.current[1],
+        positionRef.current[2]
+      );
+      localAvatarState.position = positionRef.current;
+      localAvatarState.rotationY = currentRotationY.current;
+    }
+
+    wasSittingRef.current = isCurrentlySitting;
+
+    if (isCurrentlySitting) {
       // Check if near sofa [4.5, 2.4] or desk chair [-4.7, -2.0]
       const [currX, , currZ] = positionRef.current;
       const distToSofa = Math.hypot(currX - 4.5, currZ - 2.4);
-      const distToDeskChair = Math.hypot(currX - (-4.7), currZ - (-2.0));
+      const distToDeskChair = Math.hypot(currX - -4.7, currZ - -2.0);
 
       if (distToSofa < 2.0 || isSittingOnSofa) {
-        // Sofa Seat
+        currentSeatTypeRef.current = 'sofa';
         positionRef.current = [4.5, 0.1, 2.4];
         currentRotationY.current = -Math.PI / 2;
       } else if (distToDeskChair < 1.8) {
-        // Desk Ergonomic Chair
+        currentSeatTypeRef.current = 'desk_chair';
         positionRef.current = [-4.7, 0.1, -2.0];
         currentRotationY.current = 0;
+      } else if (!currentSeatTypeRef.current) {
+        currentSeatTypeRef.current = 'floor';
       }
-      // Otherwise sit right where standing!
 
-      groupRef.current.position.set(positionRef.current[0], positionRef.current[1], positionRef.current[2]);
+      groupRef.current.position.set(
+        positionRef.current[0],
+        positionRef.current[1],
+        positionRef.current[2]
+      );
       groupRef.current.rotation.y = currentRotationY.current;
 
       localAvatarState.position = positionRef.current;
