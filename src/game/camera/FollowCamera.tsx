@@ -94,8 +94,8 @@ export const FollowCamera: React.FC<FollowCameraProps> = ({ targetPosition }) =>
     }
 
     if (isSittingOnSofa) {
-      const sofaCamPos = new THREE.Vector3(2.2, 1.4, 2.6);
-      const sofaLookAt = new THREE.Vector3(4.5, 0.9, 2.6);
+      const sofaCamPos = new THREE.Vector3(3.2, 1.3, 0.9);
+      const sofaLookAt = new THREE.Vector3(4.5, 0.75, 2.7);
       orbitRef.current.currentCamPos.lerp(sofaCamPos, 1 - Math.exp(-6 * delta));
       orbitRef.current.targetLookAt.lerp(sofaLookAt, 1 - Math.exp(-6 * delta));
       camera.position.copy(orbitRef.current.currentCamPos);

@@ -46,13 +46,12 @@
     - Khu vực Lounge cao cấp: Sofa Scandinavian đệm vải bouclé cao cấp, bàn trà lồng đôi (đá cẩm thạch trắng Carrara + kính màu khói viền đồng thau), ly cà phê gốm thủ công, chậu cây trầu bà lá xẻ (Monstera Deliciosa) với cành lá uốn lượn tự nhiên, TV khung tranh OLED "The Frame".
     - Kệ sách kiến trúc mở với dải LED hắt từng tầng, tượng decor hình vành khuyên kim loại mạ vàng, bình gốm cắm cành hoa khô.
   - **Character Kinematics & Expressive Actions Engine Calibration: PASS**
-    - **Mixamo Bone Coordinate Alignment:** Hiệu chỉnh chính xác hệ trục quay góc Euler cho toàn bộ xương armature (vai, cánh tay, cẳng tay, hông, cột sống, đầu):
-      - Trục Z chuẩn Mixamo: Z âm (leftArm) / Z dương (rightArm) hạ tay áp sát thân mình khi nghỉ (idle rest: `[0, 0, -1.2]` và `[0, 0, 1.2]`), loại bỏ triệt để lỗi tay bị dang ngang hình chữ T (T-pose).
-      - Trục Y chuẩn Yaw: Đưa cánh tay vươn về phía trước ngực và bắt tay (`[0, 1.2, 0.35]`).
-      - Trục X chuẩn Pitch: Cúi gập thân người và nghiêng đầu biểu cảm.
-    - **Natural Seating Posture:** Tư thế ngồi ghế làm việc / sofa / ngồi bệt được căn chỉnh tự nhiên:
-      - Hông hạ xuống cao độ chuẩn mặt ghế (`y = 58cm`), đùi gập ngang 90° (`leftUpLeg`/`rightUpLeg`), cẳng chân hạ thẳng vuông góc (`leftLeg`/`rightLeg`), hai bàn chân chạm sàn vững vàng (`y = 0.05m`).
-      - Hai cánh tay gập nhẹ xuôi theo đùi, cẳng tay đặt êm ái trên đùi (`leftArm: [0, -0.3, -1.1]`, `leftForeArm: [0, -0.6, 0.4]`).
+    - **Desk & Sofa Seating Direction Calibration:**
+      - Ngồi bàn làm việc: Hướng mặt quay góc `Math.PI` (180°) nhìn thẳng vào màn hình cong Ultrawide và bàn phím (không còn bị nhìn ngược ra sau phòng).
+      - Ngồi ghế Sofa: Hướng mặt quay góc `Math.PI` (180°) nhìn thẳng ra bàn trà và không gian phòng khách (loại bỏ hoàn toàn góc `-Math.PI/2` làm nhân vật ngồi ngang quay mặt vào tay vịn).
+      - Triệt tiêu tư thế "ngồi xổm": Hạ cao độ hông xuống $52\,\text{cm}$ tựa chuẩn vào mặt đệm ghế/sofa; bổ sung góc gập bàn chân $X = -0.7\,\text{rad}$ giúp lòng bàn chân áp phẳng tự nhiên xuống sàn nhà (không còn cắm mũi chân xuống đất).
+    - **Handshake Orientation Fix:** Khắc phục góc xoay cánh tay bắt tay với Forearm Roll $X = -1.57\,\text{rad}$, đưa ngón tay cái hướng thẳng lên trên và lòng bàn tay khép dọc tự nhiên (loại bỏ hoàn toàn lỗi ngón cái cắm ngược xuống dưới).
+    - **Recruiter 3D Necktie & Collar Addition:** Bổ sung mô hình 3D cổ áo sơ mi trắng, cà vạt lụa đỏ thắm (Crimson Silk Tie) và kẹp cà vạt vàng kim bóng loáng gắn vào xương ngực `mixamorigSpine2` cho vai trò Nhà tuyển dụng; động tác "Chỉnh cà vạt" (`adjust_tie`) được tinh chỉnh đưa tay chạm đúng nút thắt cà vạt trên ngực.
     - **Skeletal Clip Blending:** Tận dụng trực tiếp các clip animation mocap gốc của Mixamo (`agree`, `headShake`, `sneak_pose`, `idle`, `walk`, `run`) cho các hành động gật đầu đồng ý (`nod_approval`, `discuss_architecture`), lắc đầu suy tư (`think_ponder`), rón rén lén lút (`sneak_crouch`, `inspect_vault`).
     - **Action Props Scaled & Attached:** Cốc cà phê sứ, điện thoại smartphone tích hợp đèn flash nhấp nháy phát quang, tập hồ sơ CV ứng viên, tia quét laser màu đỏ được định vị chuẩn xác vào lòng bàn tay và kính thực tế ảo của nhân vật.
   - Production Deployment on GitHub Pages: `https://mrnvdong.github.io/the-room/`.
