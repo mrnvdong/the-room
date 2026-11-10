@@ -15,8 +15,8 @@ import { InteractionManager } from '../interactions/InteractionManager';
 import { ProximityIndicators } from '../interactions/ProximityIndicators';
 
 export const RoomScene: React.FC = () => {
-  // Avatar world position: starting at room entrance (X: 0, Y: 0, Z: 4.5)
-  const avatarPositionRef = useRef<[number, number, number]>([0, 0, 4.5]);
+  // Avatar world position: starting at room entrance (X: 0, Y: 0, Z: 3.2)
+  const avatarPositionRef = useRef<[number, number, number]>([0, 0, 3.2]);
 
   return (
     <>

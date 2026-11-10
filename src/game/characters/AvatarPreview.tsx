@@ -13,12 +13,12 @@ const Turntable: React.FC<{ identity: VisitorIdentity }> = ({ identity }) => {
 
   useFrame((_, delta) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.7; // Gentle auto-spin
+      groupRef.current.rotation.y += delta * 0.5; // Gentle auto-spin
     }
   });
 
   return (
-    <group ref={groupRef} position={[0, -0.9, 0]}>
+    <group ref={groupRef} position={[0, -0.95, 0]}>
       <AvatarModel identity={identity} isTurntablePreview />
     </group>
   );
@@ -26,9 +26,9 @@ const Turntable: React.FC<{ identity: VisitorIdentity }> = ({ identity }) => {
 
 export const AvatarPreview: React.FC<AvatarPreviewProps> = ({ identity }) => {
   return (
-    <div className="w-full h-56 rounded-2xl bg-gradient-to-b from-slate-800/40 to-slate-950/80 border border-white/10 overflow-hidden relative shadow-inner">
+    <div className="w-full h-56 rounded-2xl bg-slate-900 border border-white/10 overflow-hidden relative shadow-inner">
       <Canvas
-        camera={{ position: [0, 0.4, 2.5], fov: 42 }}
+        camera={{ position: [0, 0.35, 2.7], fov: 42 }}
         gl={{ antialias: true, alpha: true, powerPreference: 'default' }}
         onCreated={({ gl }) => {
           gl.domElement.addEventListener(
@@ -38,9 +38,9 @@ export const AvatarPreview: React.FC<AvatarPreviewProps> = ({ identity }) => {
           );
         }}
       >
-        <ambientLight intensity={1.2} />
-        <directionalLight position={[2, 3, 3]} intensity={2.0} color="#ffffff" />
-        <pointLight position={[-2, 1, 2]} intensity={0.8} color="#38bdf8" />
+        <ambientLight intensity={1.4} />
+        <directionalLight position={[2, 3, 3]} intensity={2.2} color="#ffffff" />
+        <pointLight position={[-2, 1, 2]} intensity={1.0} color="#38bdf8" />
         <Turntable identity={identity} />
       </Canvas>
       <div className="absolute bottom-2 inset-x-0 text-center text-[10px] text-slate-400 font-mono tracking-wider uppercase pointer-events-none">

@@ -18,7 +18,7 @@ interface AvatarProps {
 export const Avatar: React.FC<AvatarProps> = ({ positionRef }) => {
   const { camera } = useThree();
   const groupRef = useRef<THREE.Group>(null);
-  const currentRotationY = useRef(0);
+  const currentRotationY = useRef(Math.PI);
   const currentSeatTypeRef = useRef<'desk_chair' | 'sofa' | 'floor' | null>(null);
   const wasSittingRef = useRef(false);
 

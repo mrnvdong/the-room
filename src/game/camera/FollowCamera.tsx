@@ -18,10 +18,10 @@ export const FollowCamera: React.FC<FollowCameraProps> = ({ targetPosition }) =>
   // Camera spherical orbit state
   const orbitRef = useRef({
     yaw: 0, // Horizontal rotation in radians
-    pitch: 0.35, // Vertical angle in radians (elevated)
-    distance: 4.2, // Distance behind character
-    targetLookAt: new THREE.Vector3(0, 1.2, 0),
-    currentCamPos: new THREE.Vector3(0, 3, 5),
+    pitch: 0.22, // Vertical angle in radians (heroic eye-level third-person)
+    distance: 3.2, // Distance behind character
+    targetLookAt: new THREE.Vector3(0, 1.1, 0),
+    currentCamPos: new THREE.Vector3(0, 1.8, 5.0),
     isDragging: false,
     lastMouseX: 0,
     lastMouseY: 0,

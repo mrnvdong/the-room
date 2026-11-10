@@ -17,43 +17,48 @@ export const RoomLighting: React.FC = () => {
       sunPos: [number, number, number];
       ceilingColor: string;
       ceilingIntensity: number;
+      accentColor: string;
     }
   > = {
     clear: {
       ambientColor: '#cbd5e1',
-      ambientIntensity: 0.7,
+      ambientIntensity: 0.75,
       sunColor: '#fffbeb',
-      sunIntensity: enableShadows ? 2.4 : 1.8,
+      sunIntensity: enableShadows ? 2.6 : 1.9,
       sunPos: [-9, 7, 1],
       ceilingColor: '#fef3c7',
-      ceilingIntensity: 1.2,
+      ceilingIntensity: 1.4,
+      accentColor: '#38bdf8',
     },
     sunset: {
       ambientColor: '#fed7aa',
-      ambientIntensity: 0.65,
+      ambientIntensity: 0.7,
       sunColor: '#fb923c',
-      sunIntensity: enableShadows ? 2.6 : 2.0,
+      sunIntensity: enableShadows ? 2.8 : 2.1,
       sunPos: [-9, 4.2, 1],
       ceilingColor: '#ffedd5',
-      ceilingIntensity: 1.1,
+      ceilingIntensity: 1.3,
+      accentColor: '#f43f5e',
     },
     rain: {
       ambientColor: '#64748b',
-      ambientIntensity: 0.55,
+      ambientIntensity: 0.6,
       sunColor: '#94a3b8',
-      sunIntensity: enableShadows ? 1.4 : 1.0,
+      sunIntensity: enableShadows ? 1.5 : 1.1,
       sunPos: [-9, 7, 1],
       ceilingColor: '#fef3c7',
-      ceilingIntensity: 1.3,
+      ceilingIntensity: 1.4,
+      accentColor: '#38bdf8',
     },
     night: {
       ambientColor: '#1e293b',
-      ambientIntensity: 0.42,
+      ambientIntensity: 0.45,
       sunColor: '#38bdf8',
-      sunIntensity: enableShadows ? 0.9 : 0.6,
+      sunIntensity: enableShadows ? 1.0 : 0.7,
       sunPos: [-9, 6, 1],
       ceilingColor: '#fbbf24',
-      ceilingIntensity: 1.6,
+      ceilingIntensity: 1.8,
+      accentColor: '#818cf8',
     },
   };
 
@@ -79,7 +84,8 @@ export const RoomLighting: React.FC = () => {
         shadow-camera-right={8}
         shadow-camera-top={8}
         shadow-camera-bottom={-8}
-        shadow-bias={-0.0005}
+        shadow-bias={-0.0003}
+        shadow-radius={2.5}
       />
 
       {/* 3. Warm Interior Ceiling Fill Light */}
@@ -87,11 +93,42 @@ export const RoomLighting: React.FC = () => {
         position={[0, 3.8, 0]}
         intensity={current.ceilingIntensity}
         color={current.ceilingColor}
-        distance={12}
+        distance={14}
+        decay={2}
       />
 
-      {/* 4. Subtle Cool Accent Light from Room Center */}
-      <pointLight position={[2, 3.2, 2]} intensity={0.6} color="#e0f2fe" distance={8} />
+      {/* 4. Architectural Workstation Overhead Downlight */}
+      <spotLight
+        position={[-4.7, 4.0, -2.5]}
+        target-position={[-4.7, 0.8, -3.7]}
+        intensity={2.2}
+        color="#fffbeb"
+        angle={0.65}
+        penumbra={0.7}
+        distance={6}
+        decay={2}
+      />
+
+      {/* 5. Lounge Overhead Warm Mood Light */}
+      <spotLight
+        position={[4.5, 4.0, 1.8]}
+        target-position={[4.5, 0.4, 2.0]}
+        intensity={1.8}
+        color="#fef3c7"
+        angle={0.7}
+        penumbra={0.8}
+        distance={6}
+        decay={2}
+      />
+
+      {/* 6. Subtle Cool Accent Rim Light from Room Center */}
+      <pointLight
+        position={[2, 3.2, 2]}
+        intensity={0.6}
+        color={current.accentColor}
+        distance={9}
+        decay={2}
+      />
     </group>
   );
 };
