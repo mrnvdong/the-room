@@ -55,6 +55,16 @@
     - **Skeletal Clip Blending:** Tận dụng trực tiếp các clip animation mocap gốc của Mixamo (`agree`, `headShake`, `sneak_pose`, `idle`, `walk`, `run`) cho các hành động gật đầu đồng ý (`nod_approval`, `discuss_architecture`), lắc đầu suy tư (`think_ponder`), rón rén lén lút (`sneak_crouch`, `inspect_vault`).
     - **Action Props Scaled & Attached:** Cốc cà phê sứ, điện thoại smartphone tích hợp đèn flash nhấp nháy phát quang, tập hồ sơ CV ứng viên, tia quét laser màu đỏ được định vị chuẩn xác vào lòng bàn tay và kính thực tế ảo của nhân vật.
   - Production Deployment on GitHub Pages: `https://mrnvdong.github.io/the-room/`.
+- **Phase 7 — Realistic Modern Human Avatar & Virtual Tour Aesthetic (`video1.mp4`): PASS**
+  - **Photorealistic Human Model (`public/models/human_avatar.glb`):** Thay thế mô hình ma-nơ-canh đeo kính VR bằng nhân vật người thật hiện đại theo đúng phong cách `video1.mp4` (*Nha Trang Online Virtual Tour*):
+    - Tỉ lệ cơ thể người thật 1:1 (cao 1.86m), khuôn mặt nam thanh niên tự nhiên (mắt, chân mày, mũi, miệng, làn da PBR chân thực), kiểu tóc ngắn đen gọn gàng.
+    - Trang phục đời thường năng động (Modern Casual): Áo thun cổ tròn (đổi màu theo vai trò), quần jeans/chinos xanh đen, giày sneaker tối màu.
+    - Balo du lịch 3D (Travel Canvas Backpack) đeo sau lưng (`Spine2`, `z = -0.16`) gồm thân balo, ngăn phụ phía trước, nắp gập, quai đeo vai đôi và túi đựng bình nước bên hông.
+    - Phụ kiện Cà vạt đỏ & Kẹp vàng (Recruiter Formal Tie) gắn chuẩn trước ngực (`z = +0.11`) cho vai trò Nhà tuyển dụng.
+  - **Official Ready Player Me Mocap Animations:** Tích hợp bộ chuyển động chuẩn xương người thật (`M_Standing_Idle_001`, `M_Walk_001`, `M_Run_001`, `M_Talking_Variations_001`, `M_Dances_001`) giúp dáng đi bộ, chạy và đứng thở mượt mà, không bị biến dạng khớp xương.
+  - **Third-Person Camera & Kinematics Alignment:**
+    - Căn chỉnh góc nhìn thứ 3 từ phía sau lưng nhân vật (nhìn rõ balo và chuyển động bước chân như `video1.mp4`).
+    - Tinh chỉnh tư thế ngồi ghế làm việc và sofa chuẩn xác (hông cao `0.52m`, đùi ngang, gối gập 90°, bàn chân đặt phẳng trên sàn, hai tay đặt tự nhiên).
 
 ## Content Integrity
 

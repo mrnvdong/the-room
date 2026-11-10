@@ -24,7 +24,7 @@ const getAssetUrl = (relativePath: string) => {
   return `${cleanBase}${cleanPath}`;
 };
 
-export const MODEL_URL = getAssetUrl('models/xbot.glb');
+export const MODEL_URL = getAssetUrl('models/human_avatar.glb');
 
 // Preload the rigged humanoid model
 try {
@@ -33,79 +33,64 @@ try {
   // Ignore preload error on offline environments
 }
 
-// Helper to determine role color palettes
+// Helper to determine role color palettes (Realistic Wardrobe matching video1.mp4)
 function getIdentityPalette(identity: VisitorIdentity) {
-  let bodyColor = 0x2563eb; // Metaverse Explorer blue
-  let jointColor = 0x0f172a; // Dark slate
-  let visorScreenColor = 0x06b6d4; // Cyan
-  let visorEmissive = 0x0284c7;
-  let earColor = 0x8b5cf6; // Purple
-  let hairColor = 0x854d0e; // Clay chestnut brown
-  let frameColor = 0xf8fafc; // White
+  let bodyColor = 0x0284c7; // Modern sky/teal T-shirt like video1.mp4
+  let pantsColor = 0x334155; // Denim slate jeans
+  let hairColor = 0x292524; // Natural dark hair
+  let backpackColor = 0x996d44; // Camel canvas
+  let pocketColor = 0x7c5330;
 
   if (identity === 'recruiter') {
-    bodyColor = 0x1e3a8a; // Navy Suit
-    jointColor = 0x0f172a;
-    visorScreenColor = 0xef4444; // Crimson Red Tie accent
-    visorEmissive = 0xb91c1c;
-    earColor = 0x475569;
-    hairColor = 0x1f2937;
-    frameColor = 0x334155;
+    bodyColor = 0x1e3a8a; // Navy Suit shirt
+    pantsColor = 0x0f172a; // Dark charcoal trousers
+    hairColor = 0x1c1917;
+    backpackColor = 0x334155; // Executive dark slate backpack
+    pocketColor = 0x1e293b;
   } else if (identity === 'partner') {
-    bodyColor = 0x065f46; // Emerald Green
-    jointColor = 0x022c22;
-    visorScreenColor = 0x34d399; // Mint
-    visorEmissive = 0x059669;
-    earColor = 0x10b981;
-    hairColor = 0x3f3f46;
-    frameColor = 0xe2e8f0;
+    bodyColor = 0x065f46; // Dark Emerald
+    pantsColor = 0x1e293b;
+    hairColor = 0x27272a;
+    backpackColor = 0x785535;
+    pocketColor = 0x5a3a1f;
   } else if (identity === 'friend') {
-    bodyColor = 0xd97706; // Amber
-    jointColor = 0x451a03;
-    visorScreenColor = 0xfbbf24; // Gold
-    visorEmissive = 0xd97706;
-    earColor = 0xf59e0b;
-    hairColor = 0x7c2d12;
-    frameColor = 0xfef08a;
+    bodyColor = 0xd97706; // Warm Amber
+    pantsColor = 0x3b5371; // Blue jeans
+    hairColor = 0x451a03;
+    backpackColor = 0x996d44;
+    pocketColor = 0x7c5330;
   } else if (identity === 'thief') {
-    bodyColor = 0x0f172a; // Stealth Slate
-    jointColor = 0x020617;
-    visorScreenColor = 0xf43f5e; // Laser Red
-    visorEmissive = 0xe11d48;
-    earColor = 0xbe123c;
-    hairColor = 0x111827;
-    frameColor = 0x1e293b;
+    bodyColor = 0x0f172a; // Stealth Charcoal
+    pantsColor = 0x020617;
+    hairColor = 0x0a0a0a;
+    backpackColor = 0x1e293b;
+    pocketColor = 0x0f172a;
   } else if (identity === 'ghost') {
-    bodyColor = 0x0891b2; // Spectral Cyan
-    jointColor = 0x164e63;
-    visorScreenColor = 0xa5f3fc;
-    visorEmissive = 0x38bdf8;
-    earColor = 0x67e8f9;
+    bodyColor = 0x06b6d4; // Spectral Cyan
+    pantsColor = 0x0891b2;
     hairColor = 0xcffafe;
-    frameColor = 0xecfeff;
+    backpackColor = 0x0e7490;
+    pocketColor = 0x155e75;
   } else if (identity === 'robot') {
-    bodyColor = 0x475569; // Chrome Steel
-    jointColor = 0x1e293b;
-    visorScreenColor = 0x22d3ee; // Laser Cyan
-    visorEmissive = 0x06b6d4;
-    earColor = 0x0ea5e9;
-    hairColor = 0x94a3b8;
-    frameColor = 0xcbd5e1;
+    bodyColor = 0x475569; // Graphite
+    pantsColor = 0x1e293b;
+    hairColor = 0x71717a;
+    backpackColor = 0x334155;
+    pocketColor = 0x1e293b;
   } else if (identity === 'mystery') {
     bodyColor = 0x312e81; // Deep Indigo
-    jointColor = 0x1e1b4b;
-    visorScreenColor = 0xf59e0b; // Amber Gold
-    visorEmissive = 0xd97706;
-    earColor = 0x6366f1;
+    pantsColor = 0x18181b;
     hairColor = 0x18181b;
-    frameColor = 0x4338ca;
+    backpackColor = 0x4338ca;
+    pocketColor = 0x3730a3;
   }
 
-  return { bodyColor, jointColor, visorScreenColor, visorEmissive, earColor, hairColor, frameColor };
+  return { bodyColor, pantsColor, hairColor, backpackColor, pocketColor };
 }
 
 /**
  * 1. REAL RIGGED GLB SKINNEDMESH AVATAR WITH FULL KINEMATICS ENGINE
+ * Realistic 3D Human Character matching video1.mp4 (Nha Trang Online)
  */
 const GLBAvatar: React.FC<AvatarModelProps> = ({
   identity,
@@ -128,239 +113,150 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
   const clonedScene = useMemo(() => {
     const clone = SkeletonUtils.clone(scene) as THREE.Group;
 
-    // Apply materials to body and joints
+    // Apply realistic PBR materials to character clothing while preserving photorealistic face & skin
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
-        if (mesh.name === 'Beta_Joints') {
-          mesh.material = new THREE.MeshStandardMaterial({
-            color: palette.jointColor,
-            roughness: 0.45,
-            metalness: 0.3,
-          });
-        } else {
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        // Keep photorealistic textures for Head, Eyes, Teeth
+        if (
+          mesh.name.includes('Head') ||
+          mesh.name.includes('Eye') ||
+          mesh.name.includes('Teeth')
+        ) {
+          if (identity === 'ghost' && mesh.material) {
+            (mesh.material as THREE.Material).transparent = true;
+            (mesh.material as THREE.Material).opacity = 0.75;
+          }
+          return;
+        }
+
+        // T-Shirt styling by role
+        if (mesh.name === 'Wolf3D_Outfit_Top') {
           mesh.material = new THREE.MeshStandardMaterial({
             color: palette.bodyColor,
-            roughness: 0.35,
-            metalness: 0.15,
+            roughness: 0.65,
+            metalness: 0.05,
             transparent: identity === 'ghost',
             opacity: identity === 'ghost' ? 0.75 : 1.0,
           });
         }
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
+        // Pants / Jeans
+        else if (mesh.name === 'Wolf3D_Outfit_Bottom') {
+          mesh.material = new THREE.MeshStandardMaterial({
+            color: palette.pantsColor,
+            roughness: 0.8,
+            metalness: 0.02,
+            transparent: identity === 'ghost',
+            opacity: identity === 'ghost' ? 0.75 : 1.0,
+          });
+        }
+        // Footwear / Sneakers
+        else if (mesh.name === 'Wolf3D_Outfit_Footwear') {
+          mesh.material = new THREE.MeshStandardMaterial({
+            color: 0x1e293b,
+            roughness: 0.5,
+            metalness: 0.1,
+          });
+        }
+        // Hair
+        else if (mesh.name === 'Wolf3D_Hair') {
+          mesh.material = new THREE.MeshStandardMaterial({
+            color: palette.hairColor,
+            roughness: 0.85,
+            metalness: 0.05,
+          });
+        }
       }
     });
 
-    // Attach Stylized Pixar VR Headset, Clay Hair & Face to mixamorigHead
-    const headBone = clone.getObjectByName('mixamorigHead');
-    if (headBone) {
-      const headRig = new THREE.Group();
-      headRig.name = 'metaverse_head_rig';
-      headRig.scale.setScalar(100);
+    // Attach Travel Canvas Backpack (Balo) from video1.mp4 to Spine2
+    const spine2Bone =
+      clone.getObjectByName('Spine2') ||
+      clone.getObjectByName('mixamorigSpine2') ||
+      clone.getObjectByName('mixamorig:Spine2');
 
-      // Warm Peach Clay Skin & Smiling Face
-      const skinMat = new THREE.MeshStandardMaterial({
-        color: 0xffedd5,
-        roughness: 0.65,
-        metalness: 0.0,
+    if (spine2Bone) {
+      const backpackRig = new THREE.Group();
+      backpackRig.name = 'travel_backpack_rig';
+
+      // Attach Travel Canvas Backpack (Balo) from video1.mp4 to Spine2 (Back of character)
+      const bagMat = new THREE.MeshStandardMaterial({
+        color: palette.backpackColor,
+        roughness: 0.85,
+        metalness: 0.08,
       });
+      const bag = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.38, 0.15), bagMat);
+      bag.position.set(0, -0.05, -0.16); // Mounted on the back
 
-      const faceGeo = new THREE.SphereGeometry(0.125, 24, 24);
-      const face = new THREE.Mesh(faceGeo, skinMat);
-      face.scale.set(0.96, 1.02, 0.98);
-      face.position.set(0, 0.03, 0.035);
-      headRig.add(face);
-
-      // Smiling mouth
-      const smileGeo = new THREE.TorusGeometry(0.025, 0.005, 12, 16, Math.PI);
-      const smileMat = new THREE.MeshBasicMaterial({ color: 0x7c2d12 });
-      const smile = new THREE.Mesh(smileGeo, smileMat);
-      smile.rotation.x = Math.PI * 0.9;
-      smile.position.set(0, 0.02, 0.135);
-      headRig.add(smile);
-
-      // Button nose
-      const noseGeo = new THREE.SphereGeometry(0.012, 12, 12);
-      const nose = new THREE.Mesh(noseGeo, skinMat);
-      nose.position.set(0, 0.05, 0.14);
-      headRig.add(nose);
-
-      // VR Headset Frame
-      const visorFrameGeo = new THREE.BoxGeometry(0.24, 0.11, 0.12);
-      const visorFrameMat = new THREE.MeshStandardMaterial({
-        color: palette.frameColor,
-        roughness: 0.25,
-        metalness: 0.15,
+      // Back Zipper Storage Pocket
+      const pocketMat = new THREE.MeshStandardMaterial({
+        color: palette.pocketColor,
+        roughness: 0.9,
       });
-      const visorFrame = new THREE.Mesh(visorFrameGeo, visorFrameMat);
-      visorFrame.position.set(0, 0.11, 0.09);
-      headRig.add(visorFrame);
+      const pocket = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.19, 0.06), pocketMat);
+      pocket.position.set(0, -0.08, -0.25);
 
-      // Glowing Holographic Screen
-      const screenGeo = new THREE.BoxGeometry(0.21, 0.08, 0.02);
-      const screenMat = new THREE.MeshStandardMaterial({
-        color: palette.visorScreenColor,
-        emissive: palette.visorEmissive,
-        emissiveIntensity: 0.95,
-        roughness: 0.08,
-        metalness: 0.9,
-      });
-      const screen = new THREE.Mesh(screenGeo, screenMat);
-      screen.position.set(0, 0.11, 0.155);
-      headRig.add(screen);
-
-      // Glass Reflection Highlight
-      const glintGeo = new THREE.BoxGeometry(0.04, 0.06, 0.005);
-      const glintMat = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        transparent: true,
-        opacity: 0.65,
-      });
-      const glint = new THREE.Mesh(glintGeo, glintMat);
-      glint.rotation.z = -0.3;
-      glint.position.set(0.06, 0.115, 0.166);
-      headRig.add(glint);
-
-      // Audio Ear Cups
-      const earGeo = new THREE.CylinderGeometry(0.048, 0.048, 0.035, 24);
-      const earMat = new THREE.MeshStandardMaterial({
-        color: palette.earColor,
-        roughness: 0.3,
-        metalness: 0.25,
-      });
-      const leftEar = new THREE.Mesh(earGeo, earMat);
-      leftEar.rotation.z = Math.PI / 2;
-      leftEar.position.set(-0.13, 0.11, 0.03);
-      headRig.add(leftEar);
-
-      const rightEar = leftEar.clone();
-      rightEar.position.x = 0.13;
-      headRig.add(rightEar);
-
-      // Headband strap
-      const strapGeo = new THREE.TorusGeometry(0.125, 0.015, 12, 24, Math.PI);
-      const strapMat = new THREE.MeshStandardMaterial({
-        color: palette.jointColor,
-        roughness: 0.6,
-      });
-      const strap = new THREE.Mesh(strapGeo, strapMat);
-      strap.rotation.x = -Math.PI / 2;
-      strap.position.set(0, 0.11, 0);
-      headRig.add(strap);
-
-      // Stylized Clay Hairstyle
-      const hairMat = new THREE.MeshStandardMaterial({
-        color: palette.hairColor,
+      // Top Flap
+      const flapMat = new THREE.MeshStandardMaterial({
+        color: 0x4a2e18,
         roughness: 0.8,
-        metalness: 0.05,
       });
+      const topFlap = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.08, 0.14), flapMat);
+      topFlap.position.set(0, 0.13, -0.15);
 
-      const hairTopGeo = new THREE.SphereGeometry(0.145, 24, 24);
-      const hairTop = new THREE.Mesh(hairTopGeo, hairMat);
-      hairTop.scale.set(0.96, 0.85, 1.05);
-      hairTop.position.set(0, 0.18, -0.01);
-      headRig.add(hairTop);
+      // Padded Ergonomic Shoulder Straps over shoulders
+      const strapMat = new THREE.MeshStandardMaterial({ color: 0x2e1e11, roughness: 0.9 });
+      const leftStrap = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.32, 0.015), strapMat);
+      leftStrap.position.set(-0.1, -0.03, -0.02);
+      leftStrap.rotation.x = -0.1;
+      const rightStrap = leftStrap.clone();
+      rightStrap.position.x = 0.1;
 
-      // Front swooshes
-      const swoosh1Geo = new THREE.ConeGeometry(0.065, 0.14, 16);
-      const swoosh1 = new THREE.Mesh(swoosh1Geo, hairMat);
-      swoosh1.rotation.x = 1.0;
-      swoosh1.rotation.z = -0.35;
-      swoosh1.position.set(0.04, 0.23, 0.09);
-      headRig.add(swoosh1);
+      // Side Elastic Water Bottle Pocket
+      const sideHolder = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.04, 0.035, 0.14, 12),
+        new THREE.MeshStandardMaterial({ color: 0x3b4252, roughness: 0.7 })
+      );
+      sideHolder.position.set(0.15, -0.06, -0.15);
 
-      const swoosh2 = swoosh1.clone();
-      swoosh2.scale.set(0.8, 0.8, 0.8);
-      swoosh2.rotation.z = 0.3;
-      swoosh2.position.set(-0.04, 0.23, 0.08);
-      headRig.add(swoosh2);
+      backpackRig.add(bag, pocket, topFlap, leftStrap, rightStrap, sideHolder);
+      spine2Bone.add(backpackRig);
 
-      // Side hair locks
-      const sideLockGeo = new THREE.SphereGeometry(0.05, 16, 16);
-      const leftLock = new THREE.Mesh(sideLockGeo, hairMat);
-      leftLock.scale.set(0.7, 1.2, 0.9);
-      leftLock.position.set(-0.12, 0.15, -0.02);
-      headRig.add(leftLock);
+      // Crisp Formal Necktie for Recruiter (Front Chest)
+      if (identity === 'recruiter') {
+        const tieRig = new THREE.Group();
+        tieRig.name = 'recruiter_necktie_rig';
+        tieRig.position.set(0, 0.14, 0.11); // Front of upper chest
 
-      const rightLock = leftLock.clone();
-      rightLock.position.x = 0.12;
-      headRig.add(rightLock);
+        const collarMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
+        const leftCollar = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.035, 0.015), collarMat);
+        leftCollar.rotation.z = 0.35;
+        leftCollar.position.set(-0.04, 0.05, 0.01);
+        const rightCollar = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.035, 0.015), collarMat);
+        rightCollar.rotation.z = -0.35;
+        rightCollar.position.set(0.04, 0.05, 0.01);
+        tieRig.add(leftCollar, rightCollar);
 
-      headBone.add(headRig);
-    }
+        const tieMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.35, metalness: 0.2 });
+        const knot = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.045, 4), tieMat);
+        knot.rotation.z = Math.PI;
+        knot.position.set(0, 0.02, 0.012);
+        tieRig.add(knot);
 
-    // Attach Sleek Oval Kneepads
-    const leftKnee = clone.getObjectByName('mixamorigLeftLeg');
-    const rightKnee = clone.getObjectByName('mixamorigRightLeg');
-    if (leftKnee && rightKnee) {
-      const padMat = new THREE.MeshStandardMaterial({
-        color: palette.jointColor,
-        roughness: 0.5,
-        metalness: 0.25,
-      });
-      const padGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.02, 16);
+        const tieBody = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.25, 0.012), tieMat);
+        tieBody.position.set(0, -0.11, 0.012);
+        tieRig.add(tieBody);
 
-      const leftPad = new THREE.Mesh(padGeo, padMat);
-      leftPad.scale.setScalar(100);
-      leftPad.rotation.x = Math.PI / 2;
-      leftPad.position.set(0, 0, 7); // 7cm in front of knee bone
-      leftKnee.add(leftPad);
+        const clipMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.9, roughness: 0.2 });
+        const tieClip = new THREE.Mesh(new THREE.BoxGeometry(0.042, 0.01, 0.006), clipMat);
+        tieClip.position.set(0.01, -0.07, 0.02);
+        tieRig.add(tieClip);
 
-      const rightPad = leftPad.clone();
-      rightKnee.add(rightPad);
-    }
-
-    // Attach Stylized 3D Red Silk Necktie & Gold Clip for Recruiter Role
-    const spine2Bone = clone.getObjectByName('mixamorigSpine2');
-    if (spine2Bone && identity === 'recruiter') {
-      const tieRig = new THREE.Group();
-      tieRig.name = 'recruiter_necktie_rig';
-      tieRig.scale.setScalar(100);
-      tieRig.position.set(0, 8, 12); // Front of upper chest below collar
-
-      // Crisp White Shirt Collar
-      const collarMat = new THREE.MeshStandardMaterial({
-        color: 0xf8fafc,
-        roughness: 0.3,
-        metalness: 0.1,
-      });
-      const leftCollar = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.035, 0.015), collarMat);
-      leftCollar.rotation.z = 0.35;
-      leftCollar.position.set(-0.04, 0.05, 0.01);
-      const rightCollar = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.035, 0.015), collarMat);
-      rightCollar.rotation.z = -0.35;
-      rightCollar.position.set(0.04, 0.05, 0.01);
-      tieRig.add(leftCollar, rightCollar);
-
-      // Crimson Red Silk Tie
-      const tieMat = new THREE.MeshStandardMaterial({
-        color: 0xef4444, // Vibrant Crimson Red
-        roughness: 0.35,
-        metalness: 0.2,
-      });
-      // Triangular Knot
-      const knot = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.045, 4), tieMat);
-      knot.rotation.z = Math.PI;
-      knot.position.set(0, 0.02, 0.012);
-      tieRig.add(knot);
-
-      // Necktie Body
-      const tieBody = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.25, 0.012), tieMat);
-      tieBody.position.set(0, -0.11, 0.012);
-      tieRig.add(tieBody);
-
-      // Metallic Gold Tie Clip
-      const clipMat = new THREE.MeshStandardMaterial({
-        color: 0xfbbf24, // Gold
-        metalness: 0.9,
-        roughness: 0.2,
-      });
-      const tieClip = new THREE.Mesh(new THREE.BoxGeometry(0.042, 0.01, 0.006), clipMat);
-      tieClip.position.set(0.01, -0.07, 0.02);
-      tieRig.add(tieClip);
-
-      spine2Bone.add(tieRig);
+        spine2Bone.add(tieRig);
+      }
     }
 
     return clone;
@@ -368,23 +264,28 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
 
   // Cache bone references for high-performance kinematic posing
   const bones = useMemo(() => {
+    const getBone = (name: string) =>
+      clonedScene.getObjectByName(name) ||
+      clonedScene.getObjectByName(`mixamorig${name}`) ||
+      clonedScene.getObjectByName(`mixamorig:${name}`);
+
     return {
-      hips: clonedScene.getObjectByName('mixamorigHips') as THREE.Bone,
-      spine: clonedScene.getObjectByName('mixamorigSpine') as THREE.Bone,
-      spine2: clonedScene.getObjectByName('mixamorigSpine2') as THREE.Bone,
-      head: clonedScene.getObjectByName('mixamorigHead') as THREE.Bone,
-      leftArm: clonedScene.getObjectByName('mixamorigLeftArm') as THREE.Bone,
-      leftForeArm: clonedScene.getObjectByName('mixamorigLeftForeArm') as THREE.Bone,
-      leftHand: clonedScene.getObjectByName('mixamorigLeftHand') as THREE.Bone,
-      rightArm: clonedScene.getObjectByName('mixamorigRightArm') as THREE.Bone,
-      rightForeArm: clonedScene.getObjectByName('mixamorigRightForeArm') as THREE.Bone,
-      rightHand: clonedScene.getObjectByName('mixamorigRightHand') as THREE.Bone,
-      leftUpLeg: clonedScene.getObjectByName('mixamorigLeftUpLeg') as THREE.Bone,
-      leftLeg: clonedScene.getObjectByName('mixamorigLeftLeg') as THREE.Bone,
-      leftFoot: clonedScene.getObjectByName('mixamorigLeftFoot') as THREE.Bone,
-      rightUpLeg: clonedScene.getObjectByName('mixamorigRightUpLeg') as THREE.Bone,
-      rightLeg: clonedScene.getObjectByName('mixamorigRightLeg') as THREE.Bone,
-      rightFoot: clonedScene.getObjectByName('mixamorigRightFoot') as THREE.Bone,
+      hips: getBone('Hips') as THREE.Bone,
+      spine: getBone('Spine') as THREE.Bone,
+      spine2: getBone('Spine2') as THREE.Bone,
+      head: getBone('Head') as THREE.Bone,
+      leftArm: getBone('LeftArm') as THREE.Bone,
+      leftForeArm: getBone('LeftForeArm') as THREE.Bone,
+      leftHand: getBone('LeftHand') as THREE.Bone,
+      rightArm: getBone('RightArm') as THREE.Bone,
+      rightForeArm: getBone('RightForeArm') as THREE.Bone,
+      rightHand: getBone('RightHand') as THREE.Bone,
+      leftUpLeg: getBone('LeftUpLeg') as THREE.Bone,
+      leftLeg: getBone('LeftLeg') as THREE.Bone,
+      leftFoot: getBone('LeftFoot') as THREE.Bone,
+      rightUpLeg: getBone('RightUpLeg') as THREE.Bone,
+      rightLeg: getBone('RightLeg') as THREE.Bone,
+      rightFoot: getBone('RightFoot') as THREE.Bone,
     };
   }, [clonedScene]);
 
@@ -394,20 +295,18 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
     const leftHand = bones.leftHand;
     const head = bones.head;
 
-    // 1. Coffee cup
+    // 1. Ceramic Coffee mug
     const cup = new THREE.Mesh(
       new THREE.CylinderGeometry(0.035, 0.025, 0.08, 16),
       new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 })
     );
-    cup.scale.setScalar(100);
-    cup.position.set(0, 6, 4);
+    cup.position.set(0, 0.08, 0.04);
     cup.visible = false;
     rightHand?.add(cup);
 
-    // 2. Smartphone with Camera Flash
+    // 2. Modern Smartphone with Camera Flash
     const phone = new THREE.Group();
-    phone.scale.setScalar(100);
-    phone.position.set(0, 6, 4);
+    phone.position.set(0, 0.08, 0.04);
     const phoneBody = new THREE.Mesh(
       new THREE.BoxGeometry(0.07, 0.12, 0.008),
       new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 })
@@ -423,10 +322,9 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
     phone.visible = false;
     rightHand?.add(phone);
 
-    // 3. CV Portfolio Folder
+    // 3. Leather CV Portfolio Dossier
     const cv = new THREE.Group();
-    cv.scale.setScalar(100);
-    cv.position.set(0, 8, 4);
+    cv.position.set(0, 0.1, 0.04);
     const folder = new THREE.Mesh(
       new THREE.BoxGeometry(0.18, 0.24, 0.015),
       new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.5 })
@@ -440,10 +338,9 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
     cv.visible = false;
     leftHand?.add(cv);
 
-    // 4. Laser Scan Beam
+    // 4. Subtle Sensor Laser Beam
     const laser = new THREE.Group();
-    laser.scale.setScalar(100);
-    laser.position.set(0, 11, 18);
+    laser.position.set(0, 0.12, 0.15);
     const beam = new THREE.Mesh(
       new THREE.CylinderGeometry(0.004, 0.004, 2.0, 8),
       new THREE.MeshBasicMaterial({ color: 0xef4444 })
@@ -466,21 +363,21 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
 
     let targetAction = 'idle';
 
-    if (isMoving || (isTurntablePreview && Math.floor(animTimeRef.current) % 6 > 3)) {
+    if (isSitting) {
+      targetAction = ''; // Procedural sitting kinematics handles seated posture
+    } else if (isMoving || (isTurntablePreview && Math.floor(animTimeRef.current) % 6 > 3)) {
       targetAction = isRunning ? 'run' : 'walk';
-    } else if (currentAction === 'nod_approval' || currentAction === 'discuss_architecture') {
-      targetAction = 'agree';
-    } else if (currentAction === 'think_ponder') {
-      targetAction = 'headShake';
-    } else if (currentAction === 'sneak_crouch' || currentAction === 'inspect_vault') {
-      targetAction = 'sneak_pose';
+    } else if (currentAction === 'dance' || currentAction === 'robot_dance') {
+      targetAction = 'dance';
+    } else if (currentAction === 'discuss_architecture' || currentAction === 'nod_approval') {
+      targetAction = 'talk';
     } else {
       targetAction = 'idle';
     }
 
-    const current = actions[targetAction];
-    if (current) {
-      current.reset().fadeIn(0.2).play();
+    const target = targetAction ? actions[targetAction] : null;
+    if (target) {
+      target.reset().fadeIn(0.2).play();
     }
 
     Object.keys(actions).forEach((key) => {
@@ -488,7 +385,7 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
         actions[key]?.fadeOut(0.2);
       }
     });
-  }, [actions, isMoving, isRunning, isTurntablePreview, currentAction]);
+  }, [actions, isMoving, isRunning, isTurntablePreview, currentAction, isSitting]);
 
   // Frame kinematics loop for sitting and expressive character actions
   useFrame((_, delta) => {
@@ -508,19 +405,18 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
     // 1. SITTING POSE KINEMATICS (Chair / Sofa)
     if (isSitting) {
       if (bones.hips) {
-        bones.hips.position.y = 52; // cm scale, seated comfortably on cushion
-        bones.hips.position.z = -2;
+        bones.hips.position.set(0, 0.52, 0.05); // Seated comfortably at chair/cushion height
       }
-      if (bones.leftUpLeg) bones.leftUpLeg.rotation.set(-Math.PI / 2.05, 0, -0.05);
-      if (bones.rightUpLeg) bones.rightUpLeg.rotation.set(-Math.PI / 2.05, 0, 0.05);
+      if (bones.leftUpLeg) bones.leftUpLeg.rotation.set(Math.PI / 2.05, 0, 0.05);
+      if (bones.rightUpLeg) bones.rightUpLeg.rotation.set(Math.PI / 2.05, 0, -0.05);
       if (bones.leftLeg) bones.leftLeg.rotation.set(Math.PI / 2.05, 0, 0);
       if (bones.rightLeg) bones.rightLeg.rotation.set(Math.PI / 2.05, 0, 0);
-      if (bones.leftFoot) bones.leftFoot.rotation.set(-0.7, 0, 0); // Flat on floor
-      if (bones.rightFoot) bones.rightFoot.rotation.set(-0.7, 0, 0); // Flat on floor
-      if (bones.leftArm) bones.leftArm.rotation.set(0, -0.3, -1.1);
-      if (bones.leftForeArm) bones.leftForeArm.rotation.set(0, -0.6, 0.4);
-      if (bones.rightArm) bones.rightArm.rotation.set(0, 0.3, 1.1);
-      if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.6, 0.4);
+      if (bones.leftFoot) bones.leftFoot.rotation.set(-0.7, 0, 0);
+      if (bones.rightFoot) bones.rightFoot.rotation.set(-0.7, 0, 0);
+      if (bones.leftArm) bones.leftArm.rotation.set(0.7, -0.1, -0.15);
+      if (bones.rightArm) bones.rightArm.rotation.set(0.7, 0.1, 0.15);
+      if (bones.leftForeArm) bones.leftForeArm.rotation.set(-0.35, -0.8, 0.2);
+      if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.35, 0.8, -0.2);
       return;
     }
 
@@ -528,56 +424,53 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
     if (currentAction && !isMoving) {
       switch (currentAction) {
         case 'wave': {
-          // Keep left arm resting at side
-          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
-          if (bones.leftForeArm) bones.leftForeArm.rotation.set(0, 0, 0);
-          // Raise right arm and wave forearm
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.4, -2.2);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0, -0.6 + Math.sin(t * 10) * 0.45);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
+          if (bones.rightArm) bones.rightArm.rotation.set(-0.2, -0.4, 1.4);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.2, 0.2, Math.sin(t * 10) * 0.45);
           if (bones.head) bones.head.rotation.z = Math.sin(t * 5) * 0.1;
           break;
         }
 
         case 'handshake': {
-          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 1.2, 0.35 + Math.sin(t * 10) * 0.08);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-1.57, 0.3, 0); // Roll -1.57 keeps palm upright and thumb UP
+          if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
+          if (bones.rightArm) bones.rightArm.rotation.set(0.2, 0.3, 0.3 + Math.sin(t * 10) * 0.05);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0.1, -1.1, 0.2);
           if (bones.spine) bones.spine.rotation.x = 0.08;
           break;
         }
 
         case 'applause': {
           const clap = Math.sin(t * 14) * 0.15;
-          if (bones.leftArm) bones.leftArm.rotation.set(0, -0.9 + clap, -0.4);
-          if (bones.leftForeArm) bones.leftForeArm.rotation.set(0, -0.5, -0.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.9 - clap, 0.4);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.5, -0.2);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.6, -0.5 + clap, -0.4);
+          if (bones.leftForeArm) bones.leftForeArm.rotation.set(-0.2, -0.9, 0.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0.6, 0.5 - clap, 0.4);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.2, 0.9, -0.2);
           break;
         }
 
         case 'drink_coffee': {
-          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
           const sip = Math.sin(t * 3);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.8 + sip * 0.1, 0.3);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.6, -1.2 + sip * 0.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0.4 + sip * 0.1, 0.4, 0.4);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.2, -1.4 + sip * 0.2, 0.3);
           if (bones.head) bones.head.rotation.x = -sip * 0.12;
           break;
         }
 
         case 'take_photo': {
-          if (bones.leftArm) bones.leftArm.rotation.set(0, -1.1, -0.5);
-          if (bones.leftForeArm) bones.leftForeArm.rotation.set(0, -0.6, -0.6);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 1.1, 0.5);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.6, -0.6);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.5, -0.5, -0.4);
+          if (bones.leftForeArm) bones.leftForeArm.rotation.set(-0.2, -1.1, 0.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0.5, 0.5, 0.4);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.2, 1.1, -0.2);
           if (bones.head) bones.head.rotation.x = 0.1;
           break;
         }
 
         case 'inspect_cv': {
-          if (bones.leftArm) bones.leftArm.rotation.set(0, -0.9, -0.5);
-          if (bones.leftForeArm) bones.leftForeArm.rotation.set(0, -0.7, -0.4);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.8, 0.4);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.6 + Math.sin(t * 4) * 0.12, -0.4);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.5, -0.5, -0.4);
+          if (bones.leftForeArm) bones.leftForeArm.rotation.set(-0.2, -1.0, 0.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0.4, 0.4, 0.3);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.1, 0.8 + Math.sin(t * 4) * 0.12, -0.2);
           if (bones.head) bones.head.rotation.x = 0.35;
           break;
         }
@@ -588,9 +481,9 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
         }
 
         case 'adjust_tie': {
-          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 1.1, 0.45);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0.6, 1.1 + Math.sin(t * 8) * 0.1, -0.9);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
+          if (bones.rightArm) bones.rightArm.rotation.set(0.4, 0.4, 0.4);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0.1, -1.4 + Math.sin(t * 8) * 0.1, 0.3);
           if (bones.head) bones.head.rotation.x = 0.2;
           break;
         }
@@ -598,38 +491,38 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
         case 'type_device': {
           const typeL = Math.sin(t * 16) * 0.08;
           const typeR = Math.cos(t * 16) * 0.08;
-          if (bones.leftArm) bones.leftArm.rotation.set(0, -1.1, -0.4);
-          if (bones.leftForeArm) bones.leftForeArm.rotation.set(0, -0.4 + typeL, -0.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 1.1, 0.4);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.4 + typeR, -0.2);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.6, -0.3, -0.3);
+          if (bones.leftForeArm) bones.leftForeArm.rotation.set(-0.1, -1.0 + typeL, 0.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0.6, 0.3, 0.3);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.1, 1.0 + typeR, -0.2);
           break;
         }
 
         case 'discuss_architecture': {
-          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.8 + Math.sin(t * 4) * 0.2, 0.4);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.4, -0.4);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
+          if (bones.rightArm) bones.rightArm.rotation.set(0.4, 0.3 + Math.sin(t * 4) * 0.2, 0.3);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.1, 0.8, -0.2);
           break;
         }
 
         case 'think_ponder': {
-          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.6, 0.3);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.7, -1.4);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
+          if (bones.rightArm) bones.rightArm.rotation.set(0.3, 0.4, 0.2);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0.1, -1.5, 0.4);
           if (bones.head) bones.head.rotation.set(-0.1, 0.2, 0.15);
           break;
         }
 
         case 'high_five': {
-          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.5, -2.3);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.4, -0.4);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
+          if (bones.rightArm) bones.rightArm.rotation.set(-0.3, -0.3, 1.5);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.2, 0);
           break;
         }
 
         case 'cheer': {
-          if (bones.leftArm) bones.leftArm.rotation.set(0, -0.3, 2.3 + Math.sin(t * 8) * 0.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.3, -2.3 - Math.sin(t * 8) * 0.2);
+          if (bones.leftArm) bones.leftArm.rotation.set(-0.4, 0.3, -1.4 + Math.sin(t * 8) * 0.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(-0.4, -0.3, 1.4 - Math.sin(t * 8) * 0.2);
           if (bones.head) bones.head.rotation.x = -0.2;
           break;
         }
@@ -644,50 +537,22 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
           break;
         }
 
-        case 'robot_dance': {
-          const step = Math.floor(t * 4) % 4;
-          if (step === 0) {
-            if (bones.rightArm) bones.rightArm.rotation.set(0, 1.4, 0);
-            if (bones.leftArm) bones.leftArm.rotation.set(0, 0, 1.4);
-          } else if (step === 1) {
-            if (bones.rightArm) bones.rightArm.rotation.set(0, 0, -1.4);
-            if (bones.leftArm) bones.leftArm.rotation.set(0, -1.4, 0);
-          } else if (step === 2) {
-            if (bones.rightArm) bones.rightArm.rotation.set(0, 0.5, -2.0);
-            if (bones.leftArm) bones.leftArm.rotation.set(0, -0.5, 0.8);
-          } else {
-            if (bones.rightArm) bones.rightArm.rotation.set(0, 0, 1.15);
-            if (bones.leftArm) bones.leftArm.rotation.set(0, -0.5, -2.0);
-          }
-          break;
-        }
-
-        case 'dance': {
-          const sway = Math.sin(t * 8);
-          if (bones.hips) bones.hips.position.x = sway * 5;
-          if (bones.leftArm) bones.leftArm.rotation.set(0, -0.8 + Math.cos(t * 8) * 0.4, -0.6);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.8 - Math.cos(t * 8) * 0.4, 0.6);
-          break;
-        }
-
         case 'laugh': {
           const bounce = Math.sin(t * 16) * 0.05;
           if (bones.spine) bones.spine.rotation.x = -0.15 + bounce;
           if (bones.head) bones.head.rotation.x = -0.2 + bounce * 2;
-          if (bones.leftArm) bones.leftArm.rotation.set(0, -0.4, -0.9);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.4, 0.9);
           break;
         }
 
         case 'spooky_boo': {
-          if (bones.hips) bones.hips.position.y = 104 + Math.sin(t * 6) * 12;
-          if (bones.leftArm) bones.leftArm.rotation.set(0, -1.2, -0.4 + Math.sin(t * 8) * 0.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 1.2, 0.4 - Math.sin(t * 8) * 0.2);
+          if (bones.hips) bones.hips.position.y = 1.0 + Math.sin(t * 6) * 0.12;
+          if (bones.leftArm) bones.leftArm.rotation.set(-0.3, 0.3, -1.3 + Math.sin(t * 8) * 0.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(-0.3, -0.3, 1.3 - Math.sin(t * 8) * 0.2);
           break;
         }
 
         case 'twirl_float': {
-          if (bones.hips) bones.hips.position.y = 104 + Math.sin(t * 4) * 15;
+          if (bones.hips) bones.hips.position.y = 1.0 + Math.sin(t * 4) * 0.15;
           if (groupRef.current) groupRef.current.rotation.y = t * 6;
           break;
         }
@@ -695,26 +560,26 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
         case 'mysterious_bow': {
           if (bones.spine) bones.spine.rotation.x = 0.45;
           if (bones.head) bones.head.rotation.x = 0.25;
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.6, 0.5);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.8, -1.0);
-          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0.3, 0.3, 0.4);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0.1, -1.2, 0.2);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
           break;
         }
 
         case 'snap_fingers': {
-          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 0.8, 0.2);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.4, -0.6);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
+          if (bones.rightArm) bones.rightArm.rotation.set(0.4, 0.3, 0.3);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.8, -0.2);
           break;
         }
 
         case 'sneak_crouch': {
-          if (bones.hips) bones.hips.position.y = 80;
+          if (bones.hips) bones.hips.position.y = 0.8;
           break;
         }
 
         case 'inspect_vault': {
-          if (bones.hips) bones.hips.position.y = 80;
+          if (bones.hips) bones.hips.position.y = 0.8;
           if (bones.head) bones.head.rotation.y = Math.sin(t * 3) * 0.4;
           break;
         }
@@ -722,8 +587,8 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
         case 'blend_in':
         case 'recharge': {
           if (bones.head) bones.head.rotation.x = 0.25;
-          if (bones.leftArm) bones.leftArm.rotation.set(0, 0, -1.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0, 0, 1.2);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
+          if (bones.rightArm) bones.rightArm.rotation.set(0.998, -0.019, 0.144);
           break;
         }
       }
@@ -769,22 +634,9 @@ const FallbackStylizedAvatar: React.FC<AvatarModelProps> = ({
 
       {/* Head */}
       <group position={[0, 1.45, 0]}>
-        <mesh position={[0, -0.04, 0]}>
+        <mesh position={[0, 0, 0]}>
           <sphereGeometry args={[0.13, 24, 24]} />
           <meshStandardMaterial color={0xffedd5} roughness={0.65} />
-        </mesh>
-        <mesh position={[0, 0.02, 0.08]}>
-          <boxGeometry args={[0.24, 0.11, 0.12]} />
-          <meshStandardMaterial color={palette.frameColor} roughness={0.25} />
-        </mesh>
-        <mesh position={[0, 0.02, 0.145]}>
-          <boxGeometry args={[0.21, 0.08, 0.02]} />
-          <meshStandardMaterial
-            color={palette.visorScreenColor}
-            emissive={palette.visorEmissive}
-            emissiveIntensity={0.9}
-            roughness={0.1}
-          />
         </mesh>
         <mesh position={[0, 0.08, -0.02]}>
           <sphereGeometry args={[0.14, 16, 16]} />
@@ -795,11 +647,11 @@ const FallbackStylizedAvatar: React.FC<AvatarModelProps> = ({
       {/* Limbs */}
       <mesh position={[-0.1, 0.45, 0]}>
         <capsuleGeometry args={[0.07, 0.45, 8, 12]} />
-        <meshStandardMaterial color={palette.bodyColor} roughness={0.35} />
+        <meshStandardMaterial color={palette.pantsColor} roughness={0.7} />
       </mesh>
       <mesh position={[0.1, 0.45, 0]}>
         <capsuleGeometry args={[0.07, 0.45, 8, 12]} />
-        <meshStandardMaterial color={palette.bodyColor} roughness={0.35} />
+        <meshStandardMaterial color={palette.pantsColor} roughness={0.7} />
       </mesh>
     </group>
   );
