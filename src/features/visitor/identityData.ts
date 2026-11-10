@@ -48,7 +48,7 @@ export const VISITOR_IDENTITIES: Record<VisitorIdentity, IdentityConfig> = {
     taglineVi: 'Khám phá không gian làm việc số và danh mục dự án',
     descriptionEn: 'Take a self-paced guided tour through the 3D studio and discover owner creations.',
     descriptionVi: 'Tự do dạo quanh phòng 3D, tìm hiểu sản phẩm và trải nghiệm tương tác.',
-    avatarConcept: 'Traveler with adventure jacket & camera',
+    avatarConcept: 'Metaverse Cyber Explorer with VR Headset & Holographic Bodysuit',
     primaryColor: '#0284c7', // Sky Blue
     accentColor: '#38bdf8', // Light Cyan
     badge: '🧭',

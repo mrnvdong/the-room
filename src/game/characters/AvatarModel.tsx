@@ -36,6 +36,7 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
   const ghostOrbsRef = useRef<THREE.Group>(null);
   const laserRef = useRef<THREE.Group>(null);
   const flashRef = useRef<THREE.PointLight>(null);
+  const holoShieldRef = useRef<THREE.Group>(null);
 
   const animTimeRef = useRef(0);
 
@@ -63,6 +64,12 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
     // Ghost floating spirit motes orbit
     if (ghostOrbsRef.current) {
       ghostOrbsRef.current.rotation.y += delta * 2.2;
+    }
+
+    // Floating Holographic Cyber Shield spin & hover
+    if (holoShieldRef.current) {
+      holoShieldRef.current.rotation.z += delta * 0.8;
+      holoShieldRef.current.position.y = -0.12 + Math.sin(animTimeRef.current * 3) * 0.03;
     }
 
     // 1. SITTING POSE
@@ -583,16 +590,36 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
             </group>
           )}
 
-          {/* Visitor: Field Jacket with Snap Pockets */}
+          {/* Visitor: Metaverse VR Bodysuit with High Tech Collar & Center Zipper Seam */}
           {isVisitor && (
-            <group position={[0, 0.05, 0.14]}>
-              <mesh position={[-0.09, 0.08, 0]}>
-                <boxGeometry args={[0.07, 0.08, 0.02]} />
-                <meshStandardMaterial color="#1e3a5f" roughness={0.7} />
+            <group position={[0, 0.04, 0.135]}>
+              {/* High Neck Tech Collar Ring */}
+              <mesh position={[0, 0.22, -0.05]} rotation={[Math.PI / 2, 0, 0]}>
+                <torusGeometry args={[0.09, 0.02, 10, 24]} />
+                <meshStandardMaterial color="#0f172a" roughness={0.4} />
               </mesh>
-              <mesh position={[0.09, 0.08, 0]}>
-                <boxGeometry args={[0.07, 0.08, 0.02]} />
-                <meshStandardMaterial color="#1e3a5f" roughness={0.7} />
+              {/* Center Vertical Zipper Seam */}
+              <mesh position={[0, -0.02, 0.005]}>
+                <boxGeometry args={[0.016, 0.44, 0.005]} />
+                <meshStandardMaterial color="#0f172a" roughness={0.4} />
+              </mesh>
+              {/* Cyber Waistband Belt with Buckle */}
+              <mesh position={[0, -0.22, 0]}>
+                <boxGeometry args={[0.3, 0.035, 0.02]} />
+                <meshStandardMaterial color="#0f172a" roughness={0.4} />
+              </mesh>
+              <mesh position={[0, -0.22, 0.012]}>
+                <boxGeometry args={[0.05, 0.025, 0.008]} />
+                <meshStandardMaterial color="#38bdf8" emissive="#0284c7" emissiveIntensity={0.8} />
+              </mesh>
+              {/* Sleek Shoulder Accent Seams */}
+              <mesh position={[-0.14, 0.16, -0.03]}>
+                <boxGeometry args={[0.06, 0.05, 0.16]} />
+                <meshStandardMaterial color="#0369a1" roughness={0.6} />
+              </mesh>
+              <mesh position={[0.14, 0.16, -0.03]}>
+                <boxGeometry args={[0.06, 0.05, 0.16]} />
+                <meshStandardMaterial color="#0369a1" roughness={0.6} />
               </mesh>
             </group>
           )}
@@ -661,9 +688,9 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
             )}
           </mesh>
 
-          {/* Top of Head (Rounded Dome) */}
+          {/* Top of Head (Rounded Hair Dome) */}
           <mesh position={[0, 0.14, 0]}>
-            <sphereGeometry args={[0.165, 20, 14, 0, Math.PI * 2, 0, Math.PI / 2]} />
+            <sphereGeometry args={[0.168, 20, 14, 0, Math.PI * 2, 0, Math.PI / 2]} />
             {isGhost ? (
               <meshStandardMaterial
                 color={identityConfig.primaryColor}
@@ -674,13 +701,18 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
               />
             ) : isRobot ? (
               <meshStandardMaterial color="#ffffff" metalness={0.2} roughness={0.1} />
+            ) : isMystery ? (
+              <meshStandardMaterial color="#1e1035" roughness={0.9} />
             ) : (
-              <meshStandardMaterial color="#fed7aa" roughness={0.45} />
+              <meshStandardMaterial
+                color={isVisitor ? '#854d0e' : isRecruiter ? '#1e293b' : isFriend ? '#78350f' : '#27272a'}
+                roughness={0.65}
+              />
             )}
           </mesh>
 
-          {/* Stylized Eyes for Humanoid Characters */}
-          {!isRobot && !isMystery && !isGhost && !isThief && (
+          {/* Stylized Eyes for Humanoid Characters (Non-Visitor wears them, Visitor wears VR Headset) */}
+          {!isRobot && !isMystery && !isGhost && !isThief && !isVisitor && (
             <group position={[0, 0.02, 0.155]}>
               {/* Left Eye */}
               <mesh position={[-0.065, 0, 0]}>
@@ -723,23 +755,23 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
               <mesh position={[0, 0.16, -0.01]}>
                 <boxGeometry args={[0.34, 0.12, 0.34]} />
                 <meshStandardMaterial
-                  color={isRecruiter ? '#1e293b' : isFriend ? '#78350f' : '#27272a'}
-                  roughness={0.7}
+                  color={isVisitor ? '#854d0e' : isRecruiter ? '#1e293b' : isFriend ? '#78350f' : '#27272a'}
+                  roughness={0.65}
                 />
               </mesh>
               {/* Side Hair Locks (Left & Right) */}
               <mesh position={[-0.17, 0.04, 0]}>
                 <cylinderGeometry args={[0.03, 0.02, 0.18, 8]} />
-                <meshStandardMaterial color={isRecruiter ? '#1e293b' : '#27272a'} roughness={0.7} />
+                <meshStandardMaterial color={isVisitor ? '#854d0e' : isRecruiter ? '#1e293b' : '#27272a'} roughness={0.65} />
               </mesh>
               <mesh position={[0.17, 0.04, 0]}>
                 <cylinderGeometry args={[0.03, 0.02, 0.18, 8]} />
-                <meshStandardMaterial color={isRecruiter ? '#1e293b' : '#27272a'} roughness={0.7} />
+                <meshStandardMaterial color={isVisitor ? '#854d0e' : isRecruiter ? '#1e293b' : '#27272a'} roughness={0.65} />
               </mesh>
               {/* Back Hair Volume */}
               <mesh position={[0, 0.06, -0.16]}>
                 <boxGeometry args={[0.32, 0.18, 0.06]} />
-                <meshStandardMaterial color={isRecruiter ? '#1e293b' : '#27272a'} roughness={0.7} />
+                <meshStandardMaterial color={isVisitor ? '#854d0e' : isRecruiter ? '#1e293b' : '#27272a'} roughness={0.65} />
               </mesh>
             </group>
           )}
@@ -791,20 +823,93 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
             </group>
           )}
 
-          {/* Visitor: Designer Glasses */}
+          {/* Visitor: Metaverse VR Headset (HMD) with Glowing Cyan Visor & Magenta Audio Cans */}
           {isVisitor && (
-            <group position={[0, 0.03, 0.16]}>
-              <mesh position={[-0.065, 0, 0]}>
-                <torusGeometry args={[0.035, 0.008, 8, 16]} />
-                <meshStandardMaterial color="#475569" metalness={0.8} />
+            <group position={[0, 0, 0]}>
+              {/* Cute Button Nose underneath Visor */}
+              <mesh position={[0, -0.04, 0.155]}>
+                <sphereGeometry args={[0.018, 10, 10]} />
+                <meshStandardMaterial color="#fca5a5" roughness={0.4} />
               </mesh>
-              <mesh position={[0.065, 0, 0]}>
-                <torusGeometry args={[0.035, 0.008, 8, 16]} />
-                <meshStandardMaterial color="#475569" metalness={0.8} />
+              {/* Cheerful Curved Smiling Mouth */}
+              <mesh position={[0, -0.082, 0.15]} rotation={[0, 0, Math.PI]}>
+                <torusGeometry args={[0.034, 0.007, 8, 16, Math.PI]} />
+                <meshStandardMaterial color="#b91c1c" roughness={0.3} />
               </mesh>
-              <mesh position={[0, 0, 0]}>
-                <boxGeometry args={[0.04, 0.008, 0.01]} />
-                <meshStandardMaterial color="#475569" metalness={0.8} />
+
+              {/* VR Headset Visor Box Chassis */}
+              <mesh position={[0, 0.045, 0.11]} castShadow>
+                <boxGeometry args={[0.36, 0.16, 0.16]} />
+                <meshStandardMaterial color="#090d16" roughness={0.3} metalness={0.7} />
+              </mesh>
+              {/* Curved Glowing Cyan OLED Visor Screen */}
+              <mesh position={[0, 0.045, 0.192]}>
+                <boxGeometry args={[0.33, 0.13, 0.01]} />
+                <meshStandardMaterial
+                  color="#38bdf8"
+                  emissive="#06b6d4"
+                  emissiveIntensity={1.6}
+                  roughness={0.08}
+                />
+              </mesh>
+              {/* Center Sensor Divider */}
+              <mesh position={[0, 0.045, 0.198]}>
+                <boxGeometry args={[0.016, 0.09, 0.008]} />
+                <meshStandardMaterial color="#020617" roughness={0.3} />
+              </mesh>
+
+              {/* Headset Side & Back Elastic Straps */}
+              <mesh position={[0, 0.045, -0.02]}>
+                <boxGeometry args={[0.365, 0.05, 0.35]} />
+                <meshStandardMaterial color="#020617" roughness={0.7} />
+              </mesh>
+
+              {/* Magenta / Purple Studio Audio Ear Cans */}
+              {/* Left Earcup */}
+              <group position={[-0.19, 0.045, 0]}>
+                <mesh rotation={[0, 0, Math.PI / 2]}>
+                  <cylinderGeometry args={[0.058, 0.058, 0.038, 20]} />
+                  <meshStandardMaterial color="#d946ef" roughness={0.3} />
+                </mesh>
+                <mesh position={[-0.02, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+                  <cylinderGeometry args={[0.042, 0.042, 0.01, 16]} />
+                  <meshStandardMaterial color="#a21caf" roughness={0.2} />
+                </mesh>
+                <mesh position={[-0.026, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+                  <sphereGeometry args={[0.012, 10, 10]} />
+                  <meshStandardMaterial color="#22d3ee" emissive="#06b6d4" emissiveIntensity={1.8} />
+                </mesh>
+              </group>
+              {/* Right Earcup */}
+              <group position={[0.19, 0.045, 0]}>
+                <mesh rotation={[0, 0, Math.PI / 2]}>
+                  <cylinderGeometry args={[0.058, 0.058, 0.038, 20]} />
+                  <meshStandardMaterial color="#d946ef" roughness={0.3} />
+                </mesh>
+                <mesh position={[0.02, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+                  <cylinderGeometry args={[0.042, 0.042, 0.01, 16]} />
+                  <meshStandardMaterial color="#a21caf" roughness={0.2} />
+                </mesh>
+                <mesh position={[0.026, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+                  <sphereGeometry args={[0.012, 10, 10]} />
+                  <meshStandardMaterial color="#22d3ee" emissive="#06b6d4" emissiveIntensity={1.8} />
+                </mesh>
+              </group>
+
+              {/* Connecting Top Audio Headband */}
+              <mesh position={[0, 0.17, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                <torusGeometry args={[0.185, 0.015, 8, 20, Math.PI]} />
+                <meshStandardMaterial color="#a21caf" roughness={0.4} />
+              </mesh>
+
+              {/* Sculpted Clay Hair Front Swooping Bangs over Visor */}
+              <mesh position={[-0.07, 0.14, 0.12]} rotation={[0.2, 0.3, -0.3]}>
+                <boxGeometry args={[0.14, 0.07, 0.08]} />
+                <meshStandardMaterial color="#854d0e" roughness={0.6} />
+              </mesh>
+              <mesh position={[0.08, 0.145, 0.11]} rotation={[0.15, -0.2, 0.25]}>
+                <boxGeometry args={[0.16, 0.07, 0.08]} />
+                <meshStandardMaterial color="#854d0e" roughness={0.6} />
               </mesh>
             </group>
           )}
@@ -950,16 +1055,93 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
               opacity={isGhost ? 0.65 : 1}
             />
           </mesh>
-          {/* Stylized Rounded Hand */}
-          <mesh position={[0, -0.42, 0]}>
-            <sphereGeometry args={[0.045, 12, 12]} />
-            <meshStandardMaterial
-              color={isRobot ? '#94a3b8' : isGhost ? identityConfig.primaryColor : '#fed7aa'}
-              roughness={0.4}
-              transparent={isGhost}
-              opacity={isGhost ? 0.65 : 1}
-            />
-          </mesh>
+          {/* Tech Wrist Cuff Ring */}
+          {!isGhost && (
+            <mesh position={[0, -0.38, 0]}>
+              <cylinderGeometry args={[0.058, 0.054, 0.035, 14]} />
+              <meshStandardMaterial color="#0f172a" roughness={0.4} />
+            </mesh>
+          )}
+          {/* Expressive Stylized 4-Finger Cartoon Hand */}
+          <group position={[0, -0.42, 0]}>
+            {/* Palm */}
+            <mesh position={[0, -0.015, 0]}>
+              <sphereGeometry args={[0.042, 12, 12]} />
+              <meshStandardMaterial
+                color={isRobot ? '#94a3b8' : isGhost ? identityConfig.primaryColor : '#fed7aa'}
+                roughness={0.4}
+                transparent={isGhost}
+                opacity={isGhost ? 0.65 : 1}
+              />
+            </mesh>
+            {/* Thumb */}
+            {!isGhost && (
+              <>
+                <mesh position={[0.032, 0.002, 0.018]} rotation={[0.2, -0.5, -0.4]}>
+                  <cylinderGeometry args={[0.012, 0.011, 0.032, 8]} />
+                  <meshStandardMaterial color={isRobot ? '#94a3b8' : '#fed7aa'} roughness={0.4} />
+                </mesh>
+                {/* Index Finger */}
+                <mesh position={[0.018, -0.042, 0.014]} rotation={[0.2, 0, 0]}>
+                  <cylinderGeometry args={[0.01, 0.009, 0.036, 8]} />
+                  <meshStandardMaterial color={isRobot ? '#94a3b8' : '#fed7aa'} roughness={0.4} />
+                </mesh>
+                {/* Middle Finger */}
+                <mesh position={[0, -0.046, 0.014]} rotation={[0.2, 0, 0]}>
+                  <cylinderGeometry args={[0.01, 0.009, 0.038, 8]} />
+                  <meshStandardMaterial color={isRobot ? '#94a3b8' : '#fed7aa'} roughness={0.4} />
+                </mesh>
+                {/* Pinky Finger */}
+                <mesh position={[-0.018, -0.04, 0.012]} rotation={[0.2, 0, 0]}>
+                  <cylinderGeometry args={[0.009, 0.008, 0.03, 8]} />
+                  <meshStandardMaterial color={isRobot ? '#94a3b8' : '#fed7aa'} roughness={0.4} />
+                </mesh>
+              </>
+            )}
+          </group>
+
+          {/* Metaverse Floating Holographic Cyber Shield Disc */}
+          {isVisitor && (
+            <group ref={holoShieldRef} position={[-0.24, -0.15, 0.22]}>
+              {/* Outer Cyan Glowing Cyber Ring */}
+              <mesh>
+                <torusGeometry args={[0.22, 0.012, 16, 32]} />
+                <meshStandardMaterial color="#38bdf8" emissive="#06b6d4" emissiveIntensity={1.8} />
+              </mesh>
+              {/* Inner Translucent Cyber Glass Shield Disc */}
+              <mesh>
+                <circleGeometry args={[0.21, 32]} />
+                <meshPhysicalMaterial
+                  color="#0284c7"
+                  emissive="#0369a1"
+                  emissiveIntensity={0.5}
+                  transmission={0.8}
+                  transparent
+                  opacity={0.65}
+                  roughness={0.15}
+                  ior={1.4}
+                />
+              </mesh>
+              {/* Concentric Reticle Rings & Crosshair Nodes */}
+              <mesh position={[0, 0, 0.005]}>
+                <ringGeometry args={[0.11, 0.12, 24]} />
+                <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={2.0} />
+              </mesh>
+              <mesh position={[0, 0, 0.005]}>
+                <ringGeometry args={[0.04, 0.05, 16]} />
+                <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={2.0} />
+              </mesh>
+              {/* Orbiting Tech Data Dots */}
+              {[-0.15, 0.15].map((px) => (
+                <mesh key={px} position={[px, 0, 0.008]}>
+                  <sphereGeometry args={[0.012, 8, 8]} />
+                  <meshStandardMaterial color="#22d3ee" emissive="#22d3ee" emissiveIntensity={2.5} />
+                </mesh>
+              ))}
+              {/* Soft Ambient Holographic Glow */}
+              <pointLight color="#38bdf8" intensity={0.5} distance={1.8} />
+            </group>
+          )}
 
           {/* Dynamic Action Prop: CV Dossier for inspect_cv */}
           {currentAction === 'inspect_cv' && (
@@ -1009,16 +1191,50 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
               opacity={isGhost ? 0.65 : 1}
             />
           </mesh>
-          {/* Stylized Rounded Hand */}
-          <mesh position={[0, -0.42, 0]}>
-            <sphereGeometry args={[0.045, 12, 12]} />
-            <meshStandardMaterial
-              color={isRobot ? '#94a3b8' : isGhost ? identityConfig.primaryColor : '#fed7aa'}
-              roughness={0.4}
-              transparent={isGhost}
-              opacity={isGhost ? 0.65 : 1}
-            />
-          </mesh>
+          {/* Tech Wrist Cuff Ring */}
+          {!isGhost && (
+            <mesh position={[0, -0.38, 0]}>
+              <cylinderGeometry args={[0.058, 0.054, 0.035, 14]} />
+              <meshStandardMaterial color="#0f172a" roughness={0.4} />
+            </mesh>
+          )}
+          {/* Expressive Stylized 4-Finger Cartoon Hand */}
+          <group position={[0, -0.42, 0]}>
+            {/* Palm */}
+            <mesh position={[0, -0.015, 0]}>
+              <sphereGeometry args={[0.042, 12, 12]} />
+              <meshStandardMaterial
+                color={isRobot ? '#94a3b8' : isGhost ? identityConfig.primaryColor : '#fed7aa'}
+                roughness={0.4}
+                transparent={isGhost}
+                opacity={isGhost ? 0.65 : 1}
+              />
+            </mesh>
+            {/* Thumb */}
+            {!isGhost && (
+              <>
+                <mesh position={[-0.032, 0.002, 0.018]} rotation={[0.2, 0.5, 0.4]}>
+                  <cylinderGeometry args={[0.012, 0.011, 0.032, 8]} />
+                  <meshStandardMaterial color={isRobot ? '#94a3b8' : '#fed7aa'} roughness={0.4} />
+                </mesh>
+                {/* Index Finger */}
+                <mesh position={[-0.018, -0.042, 0.014]} rotation={[0.2, 0, 0]}>
+                  <cylinderGeometry args={[0.01, 0.009, 0.036, 8]} />
+                  <meshStandardMaterial color={isRobot ? '#94a3b8' : '#fed7aa'} roughness={0.4} />
+                </mesh>
+                {/* Middle Finger */}
+                <mesh position={[0, -0.046, 0.014]} rotation={[0.2, 0, 0]}>
+                  <cylinderGeometry args={[0.01, 0.009, 0.038, 8]} />
+                  <meshStandardMaterial color={isRobot ? '#94a3b8' : '#fed7aa'} roughness={0.4} />
+                </mesh>
+                {/* Pinky Finger */}
+                <mesh position={[0.018, -0.04, 0.012]} rotation={[0.2, 0, 0]}>
+                  <cylinderGeometry args={[0.009, 0.008, 0.03, 8]} />
+                  <meshStandardMaterial color={isRobot ? '#94a3b8' : '#fed7aa'} roughness={0.4} />
+                </mesh>
+              </>
+            )}
+          </group>
 
           {/* Recruiter: Executive Leather Briefcase with Brass Latches */}
           {isRecruiter && currentAction !== 'inspect_cv' && currentAction !== 'handshake' && (
@@ -1078,18 +1294,35 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
         <>
           {/* Left Leg */}
           <group ref={leftLegRef} position={[-0.13, 0.55, 0]}>
-            {/* Tapered Pant Leg */}
+            {/* Tapered Pant / Bodysuit Leg */}
             <mesh castShadow position={[0, -0.22, 0]}>
               <cylinderGeometry args={[0.075, 0.065, 0.48, 14]} />
               <meshStandardMaterial
-                color={isRobot ? '#475569' : isRecruiter ? '#1e293b' : '#334155'}
+                color={isRobot ? '#475569' : isRecruiter ? '#1e293b' : isVisitor ? '#0369a1' : '#334155'}
                 metalness={isRobot ? 0.6 : 0.05}
                 roughness={0.65}
               />
             </mesh>
-            {/* Modern Sneaker / Shoe */}
+
+            {/* Futuristic Tech Knee Caps */}
+            <group position={[0, -0.22, 0.065]}>
+              <mesh rotation={[Math.PI / 2, 0, 0]}>
+                <cylinderGeometry args={[0.046, 0.046, 0.018, 16]} />
+                <meshStandardMaterial color="#0f172a" roughness={0.4} />
+              </mesh>
+              <mesh position={[0, 0, 0.01]} rotation={[Math.PI / 2, 0, 0]}>
+                <torusGeometry args={[0.04, 0.006, 8, 16]} />
+                <meshStandardMaterial
+                  color={isVisitor ? '#38bdf8' : '#64748b'}
+                  emissive={isVisitor ? '#0284c7' : '#000000'}
+                  emissiveIntensity={isVisitor ? 1.0 : 0}
+                />
+              </mesh>
+            </group>
+
+            {/* Modern Sneaker / Futuristic Tech Slip-on Boot */}
             <group position={[0, -0.48, 0.04]}>
-              {/* Sole */}
+              {/* Curved White Sole */}
               <mesh position={[0, 0.015, 0]}>
                 <boxGeometry args={[0.13, 0.035, 0.22]} />
                 <meshStandardMaterial color="#ffffff" roughness={0.3} />
@@ -1098,11 +1331,11 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
               <mesh position={[0, 0.055, -0.01]}>
                 <boxGeometry args={[0.12, 0.055, 0.2]} />
                 <meshStandardMaterial
-                  color={isRecruiter ? '#090a0f' : isFriend ? '#f59e0b' : '#0284c7'}
-                  roughness={isRecruiter ? 0.2 : 0.6}
+                  color={isRecruiter ? '#090a0f' : isFriend ? '#f59e0b' : isVisitor ? '#38bdf8' : '#0284c7'}
+                  roughness={isRecruiter ? 0.2 : 0.5}
                 />
               </mesh>
-              {/* Rounded Toe Cap */}
+              {/* Rounded White Toe Cap */}
               <mesh position={[0, 0.045, 0.08]} rotation={[Math.PI / 2, 0, 0]}>
                 <cylinderGeometry args={[0.058, 0.058, 0.04, 14]} />
                 <meshStandardMaterial color="#ffffff" roughness={0.4} />
@@ -1112,27 +1345,48 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
 
           {/* Right Leg */}
           <group ref={rightLegRef} position={[0.13, 0.55, 0]}>
+            {/* Tapered Pant / Bodysuit Leg */}
             <mesh castShadow position={[0, -0.22, 0]}>
               <cylinderGeometry args={[0.075, 0.065, 0.48, 14]} />
               <meshStandardMaterial
-                color={isRobot ? '#475569' : isRecruiter ? '#1e293b' : '#334155'}
+                color={isRobot ? '#475569' : isRecruiter ? '#1e293b' : isVisitor ? '#0369a1' : '#334155'}
                 metalness={isRobot ? 0.6 : 0.05}
                 roughness={0.65}
               />
             </mesh>
-            {/* Modern Sneaker / Shoe */}
+
+            {/* Futuristic Tech Knee Caps */}
+            <group position={[0, -0.22, 0.065]}>
+              <mesh rotation={[Math.PI / 2, 0, 0]}>
+                <cylinderGeometry args={[0.046, 0.046, 0.018, 16]} />
+                <meshStandardMaterial color="#0f172a" roughness={0.4} />
+              </mesh>
+              <mesh position={[0, 0, 0.01]} rotation={[Math.PI / 2, 0, 0]}>
+                <torusGeometry args={[0.04, 0.006, 8, 16]} />
+                <meshStandardMaterial
+                  color={isVisitor ? '#38bdf8' : '#64748b'}
+                  emissive={isVisitor ? '#0284c7' : '#000000'}
+                  emissiveIntensity={isVisitor ? 1.0 : 0}
+                />
+              </mesh>
+            </group>
+
+            {/* Modern Sneaker / Futuristic Tech Slip-on Boot */}
             <group position={[0, -0.48, 0.04]}>
+              {/* Curved White Sole */}
               <mesh position={[0, 0.015, 0]}>
                 <boxGeometry args={[0.13, 0.035, 0.22]} />
                 <meshStandardMaterial color="#ffffff" roughness={0.3} />
               </mesh>
+              {/* Upper Shoe */}
               <mesh position={[0, 0.055, -0.01]}>
                 <boxGeometry args={[0.12, 0.055, 0.2]} />
                 <meshStandardMaterial
-                  color={isRecruiter ? '#090a0f' : isFriend ? '#f59e0b' : '#0284c7'}
-                  roughness={isRecruiter ? 0.2 : 0.6}
+                  color={isRecruiter ? '#090a0f' : isFriend ? '#f59e0b' : isVisitor ? '#38bdf8' : '#0284c7'}
+                  roughness={isRecruiter ? 0.2 : 0.5}
                 />
               </mesh>
+              {/* Rounded White Toe Cap */}
               <mesh position={[0, 0.045, 0.08]} rotation={[Math.PI / 2, 0, 0]}>
                 <cylinderGeometry args={[0.058, 0.058, 0.04, 14]} />
                 <meshStandardMaterial color="#ffffff" roughness={0.4} />
