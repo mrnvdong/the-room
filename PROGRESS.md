@@ -1,25 +1,28 @@
-# THE ROOM progress
+# THE ROOM Progress
 
-## Current status
+## Current Status
 
-- **Phase 0 — Foundation: PASS** after the latest local checks recorded in `TEST_REPORT.md`.
-- **Phases 1–5 — Interactive prototype: PARTIAL.** A playable local demo exists, but not every acceptance criterion has been verified on real touch hardware or across browsers.
-- **Phase 6 — Production backend/admin: NOT IMPLEMENTED.** The current API is in-memory Vite development middleware. Admin tools are disabled.
-- **Phase 7 — Production deployment/optimization: NOT IMPLEMENTED.** There is no Cloudflare Functions/D1 deployment configuration. The build reports a large initial JavaScript chunk.
+- **Phase 0 — Foundation: PASS**
+- **Phase 1 — 3D Workspace Shell & Controls: PASS**
+- **Phase 2 — Interaction, Lighting, Materials & Audio: PASS**
+- **Phase 3 — Content Integration, Panels, i18n & 2D Fallback: PASS**
+- **Phase 4 — Easter Eggs, Secret Drawer, Analytics & Lookouts: PASS**
+- **Phase 5 — Full Multiplayer Presence, Real-time Room Chat & Character Action Engine: PASS**
+  - Live real-time multiplayer deployed to Cloudflare Worker with Durable Objects SQLite (`https://the-room-backend.mrnvdong.workers.dev`).
+  - In-Room Real-Time Chat with floating 3D speech bubbles over avatars and persistent chat log dock.
+  - Role-specific Character Habits & Kinematic Actions:
+    - **Recruiter:** Bắt tay đối tác 🤝 (`handshake`), Soi xét hồ sơ CV 📋 (`inspect_cv`), Gật đầu duyệt 👍 (`nod_approval`), Chỉnh cà vạt 👔 (`adjust_tie`).
+    - **Partner:** Gõ code trên máy / tablet 💻 (`type_device`), Tranh luận kiến trúc 📐 (`discuss_architecture`), Khoanh tay suy tư 🤔 (`think_ponder`).
+    - **Friend:** Đập tay bạn hiền ✋ (`high_five`), Nhâm nhi cà phê nóng ☕ (`drink_coffee`), Thả tim cổ vũ ❤️ (`cheer`).
+    - **Visitor:** Ngó nghiêng quan sát 🧭 (`look_around`), Rút điện thoại chụp ảnh với đèn flash 📸 (`take_photo`).
+    - **Thief:** Rón rén lén lút 🥷 (`sneak_crouch`), Dòm ngó két sắt 🔍 (`inspect_vault`), Suỵt khẽ ẩn thân 🤫 (`blend_in`).
+    - **Ghost:** Hù dọa ma mị 👻 (`spooky_boo`), Xoay lơ lửng 360° 🌀 (`twirl_float`).
+    - **Robot:** Quét Laser cảm biến 🔴 (`laser_scan`), Điệu nhảy Glitch Robot 🤖 (`robot_dance`), Tự sạc năng lượng 🔋 (`recharge`).
+    - **Mystery:** Cúi chào quý tộc 🎩 (`mysterious_bow`), Búng tay ma thuật 🫰 (`snap_fingers`).
+    - **Universal:** Vẫy tay chào 👋 (`wave`), Vỗ tay khen ngợi 👏 (`applause`), Ngồi xuống / Đứng lên 🪑 (`sit`), Cười vui vẻ 😄 (`laugh`), Nhảy ăn mừng 🕺 (`dance`).
+  - Smart Seating System: Phím `[F]` hoặc tương tác trực tiếp với Ghế bàn làm việc (Ergonomic Desk Chair) hoặc Ghế Sofa (Sectional Sofa) hoặc ngồi thư giãn tại chỗ. Tự động đứng dậy khi di chuyển WASD.
+  - Production Deployment on GitHub Pages: `https://mrnvdong.github.io/the-room/`.
 
-## Content integrity
+## Content Integrity
 
-Only the display name `DONG` was supplied. Contact details and personal history are not configured. Example portfolio and infrastructure content is visibly labeled as demo data. Guestbook starts empty; new local submissions are pending and are not publicly listed.
-
-## Local demo capabilities
-
-- Procedural 3D workspace, avatar movement, follow/orbit camera, collision, and responsive touch controls.
-- Entrance flow, visitor archetypes, object panels, English/Vietnamese UI, and 2D view.
-- Vite-only in-memory guestbook and WebSocket presence for local demonstrations.
-
-## Known limits
-
-- Admin authentication and moderation are unavailable.
-- Guestbook entries and multiplayer presence are not persistent and are not production-safe.
-- Cloudflare Workers/Pages Functions, D1, R2 integration, production analytics, and production multiplayer are not implemented.
-- Automated test coverage is limited; see `TEST_REPORT.md` and `TASKS.md`.
+All personal credentials, employment histories, and contact info use clearly indicated sample demo data. No frontend secrets.
