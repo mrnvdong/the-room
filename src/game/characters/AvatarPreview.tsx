@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { Suspense, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { VisitorIdentity } from '@/types';
@@ -41,7 +41,9 @@ export const AvatarPreview: React.FC<AvatarPreviewProps> = ({ identity }) => {
         <ambientLight intensity={1.4} />
         <directionalLight position={[2, 3, 3]} intensity={2.2} color="#ffffff" />
         <pointLight position={[-2, 1, 2]} intensity={1.0} color="#38bdf8" />
-        <Turntable identity={identity} />
+        <Suspense fallback={null}>
+          <Turntable identity={identity} />
+        </Suspense>
       </Canvas>
       <div className="absolute bottom-2 inset-x-0 text-center text-[10px] text-slate-400 font-mono tracking-wider uppercase pointer-events-none">
         360° Live Character Preview

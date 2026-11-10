@@ -87,14 +87,16 @@ export const App: React.FC = () => {
           }}
           className="w-full h-full"
         >
-          {isEntranceActive ? (
-            <EntranceScene
-              onDoorbellRing={handleDoorbellRing}
-              onCameraInteract={handleCameraScan}
-            />
-          ) : (
-            <RoomScene />
-          )}
+          <Suspense fallback={null}>
+            {isEntranceActive ? (
+              <EntranceScene
+                onDoorbellRing={handleDoorbellRing}
+                onCameraInteract={handleCameraScan}
+              />
+            ) : (
+              <RoomScene />
+            )}
+          </Suspense>
         </Canvas>
       </Suspense>
 

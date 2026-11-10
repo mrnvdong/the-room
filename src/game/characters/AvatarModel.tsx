@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { Component, ErrorInfo, ReactNode, Suspense, useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF, useAnimations } from '@react-three/drei';
 import * as THREE from 'three';
@@ -16,10 +16,98 @@ interface AvatarModelProps {
   isSitting?: boolean;
 }
 
-// Preload the rigged humanoid GLB model
-useGLTF.preload('/models/xbot.glb');
+// Compute asset URL compatible with GitHub Pages subpath (./) and local dev (/)
+const getAssetUrl = (relativePath: string) => {
+  const base = import.meta.env.BASE_URL || './';
+  const cleanBase = base.endsWith('/') ? base : `${base}/`;
+  const cleanPath = relativePath.startsWith('/') ? relativePath.slice(1) : relativePath;
+  return `${cleanBase}${cleanPath}`;
+};
 
-export const AvatarModel: React.FC<AvatarModelProps> = ({
+export const MODEL_URL = getAssetUrl('models/xbot.glb');
+
+// Preload the rigged humanoid model
+try {
+  useGLTF.preload(MODEL_URL);
+} catch {
+  // Ignore preload error on offline/isolated environments
+}
+
+// Helper to determine role color palettes
+function getIdentityPalette(identity: VisitorIdentity) {
+  let bodyColor = 0x2563eb; // Metaverse Explorer blue
+  let jointColor = 0x0f172a; // Dark slate
+  let visorScreenColor = 0x06b6d4; // Cyan
+  let visorEmissive = 0x0284c7;
+  let earColor = 0x8b5cf6; // Purple
+  let hairColor = 0x854d0e; // Clay chestnut brown
+  let frameColor = 0xf8fafc; // White
+
+  if (identity === 'recruiter') {
+    bodyColor = 0x1e3a8a; // Navy Suit
+    jointColor = 0x0f172a;
+    visorScreenColor = 0xef4444; // Crimson Red Tie accent
+    visorEmissive = 0xb91c1c;
+    earColor = 0x475569;
+    hairColor = 0x1f2937; // Dark sleek hair
+    frameColor = 0x334155;
+  } else if (identity === 'partner') {
+    bodyColor = 0x065f46; // Emerald Green
+    jointColor = 0x022c22;
+    visorScreenColor = 0x34d399; // Mint
+    visorEmissive = 0x059669;
+    earColor = 0x10b981;
+    hairColor = 0x3f3f46;
+    frameColor = 0xe2e8f0;
+  } else if (identity === 'friend') {
+    bodyColor = 0xd97706; // Amber
+    jointColor = 0x451a03;
+    visorScreenColor = 0xfbbf24; // Gold
+    visorEmissive = 0xd97706;
+    earColor = 0xf59e0b;
+    hairColor = 0x7c2d12;
+    frameColor = 0xfef08a;
+  } else if (identity === 'thief') {
+    bodyColor = 0x0f172a; // Stealth Slate
+    jointColor = 0x020617;
+    visorScreenColor = 0xf43f5e; // Laser Red
+    visorEmissive = 0xe11d48;
+    earColor = 0xbe123c;
+    hairColor = 0x111827;
+    frameColor = 0x1e293b;
+  } else if (identity === 'ghost') {
+    bodyColor = 0x0891b2; // Spectral Cyan
+    jointColor = 0x164e63;
+    visorScreenColor = 0xa5f3fc;
+    visorEmissive = 0x38bdf8;
+    earColor = 0x67e8f9;
+    hairColor = 0xcffafe;
+    frameColor = 0xecfeff;
+  } else if (identity === 'robot') {
+    bodyColor = 0x475569; // Chrome Steel
+    jointColor = 0x1e293b;
+    visorScreenColor = 0x22d3ee; // Laser Cyan
+    visorEmissive = 0x06b6d4;
+    earColor = 0x0ea5e9;
+    hairColor = 0x94a3b8;
+    frameColor = 0xcbd5e1;
+  } else if (identity === 'mystery') {
+    bodyColor = 0x312e81; // Deep Indigo
+    jointColor = 0x1e1b4b;
+    visorScreenColor = 0xf59e0b; // Amber Gold
+    visorEmissive = 0xd97706;
+    earColor = 0x6366f1;
+    hairColor = 0x18181b;
+    frameColor = 0x4338ca;
+  }
+
+  return { bodyColor, jointColor, visorScreenColor, visorEmissive, earColor, hairColor, frameColor };
+}
+
+/**
+ * 1. REAL RIGGED GLB SKINNEDMESH AVATAR
+ */
+const GLBAvatar: React.FC<AvatarModelProps> = ({
   identity,
   isMoving = false,
   isRunning = false,
@@ -28,82 +116,16 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
   isSitting = false,
 }) => {
   const groupRef = useRef<THREE.Group>(null);
-  const holoShieldRef = useRef<THREE.Group>(null);
   const animTimeRef = useRef(0);
 
   // Load the 3D rigged SkinnedMesh model
-  const { scene, animations } = useGLTF('/models/xbot.glb');
+  const { scene, animations } = useGLTF(MODEL_URL);
 
-  // Clone scene so each avatar (local + remote multiplayer) has isolated bones and materials
+  const palette = useMemo(() => getIdentityPalette(identity), [identity]);
+
+  // Clone scene so each avatar has isolated bones and materials
   const clonedScene = useMemo(() => {
     const clone = SkeletonUtils.clone(scene) as THREE.Group;
-
-    // Determine colors based on visitor identity
-    let bodyColor = 0x2563eb; // Metaverse Explorer blue
-    let jointColor = 0x0f172a; // Dark slate
-    let visorScreenColor = 0x06b6d4; // Cyan
-    let visorEmissive = 0x0284c7;
-    let earColor = 0x8b5cf6; // Purple
-    let hairColor = 0x854d0e; // Clay chestnut brown
-    let frameColor = 0xf8fafc; // White
-
-    if (identity === 'recruiter') {
-      bodyColor = 0x1e3a8a; // Navy Suit
-      jointColor = 0x0f172a;
-      visorScreenColor = 0xef4444; // Crimson Red Tie accent
-      visorEmissive = 0xb91c1c;
-      earColor = 0x475569;
-      hairColor = 0x1f2937; // Dark sleek hair
-      frameColor = 0x334155;
-    } else if (identity === 'partner') {
-      bodyColor = 0x065f46; // Emerald Green
-      jointColor = 0x022c22;
-      visorScreenColor = 0x34d399; // Mint
-      visorEmissive = 0x059669;
-      earColor = 0x10b981;
-      hairColor = 0x3f3f46;
-      frameColor = 0xe2e8f0;
-    } else if (identity === 'friend') {
-      bodyColor = 0xd97706; // Amber
-      jointColor = 0x451a03;
-      visorScreenColor = 0xfbbf24; // Gold
-      visorEmissive = 0xd97706;
-      earColor = 0xf59e0b;
-      hairColor = 0x7c2d12;
-      frameColor = 0xfef08a;
-    } else if (identity === 'thief') {
-      bodyColor = 0x0f172a; // Stealth Slate
-      jointColor = 0x020617;
-      visorScreenColor = 0xf43f5e; // Laser Red
-      visorEmissive = 0xe11d48;
-      earColor = 0xbe123c;
-      hairColor = 0x111827;
-      frameColor = 0x1e293b;
-    } else if (identity === 'ghost') {
-      bodyColor = 0x0891b2; // Spectral Cyan
-      jointColor = 0x164e63;
-      visorScreenColor = 0xa5f3fc;
-      visorEmissive = 0x38bdf8;
-      earColor = 0x67e8f9;
-      hairColor = 0xcffafe;
-      frameColor = 0xecfeff;
-    } else if (identity === 'robot') {
-      bodyColor = 0x475569; // Chrome Steel
-      jointColor = 0x1e293b;
-      visorScreenColor = 0x22d3ee; // Laser Cyan
-      visorEmissive = 0x06b6d4;
-      earColor = 0x0ea5e9;
-      hairColor = 0x94a3b8;
-      frameColor = 0xcbd5e1;
-    } else if (identity === 'mystery') {
-      bodyColor = 0x312e81; // Deep Indigo
-      jointColor = 0x1e1b4b;
-      visorScreenColor = 0xf59e0b; // Amber Gold
-      visorEmissive = 0xd97706;
-      earColor = 0x6366f1;
-      hairColor = 0x18181b;
-      frameColor = 0x4338ca;
-    }
 
     // Apply materials to body and joints
     clone.traverse((child) => {
@@ -111,13 +133,13 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
         const mesh = child as THREE.Mesh;
         if (mesh.name === 'Beta_Joints') {
           mesh.material = new THREE.MeshStandardMaterial({
-            color: jointColor,
+            color: palette.jointColor,
             roughness: 0.45,
             metalness: 0.3,
           });
         } else {
           mesh.material = new THREE.MeshStandardMaterial({
-            color: bodyColor,
+            color: palette.bodyColor,
             roughness: 0.35,
             metalness: 0.15,
             transparent: identity === 'ghost',
@@ -129,15 +151,14 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
       }
     });
 
-    // Attach Stylized Pixar VR Headset, Clay Hair & Smiling Face to mixamorigHead
+    // Attach Stylized Pixar VR Headset, Clay Hair & Face to mixamorigHead
     const headBone = clone.getObjectByName('mixamorigHead');
     if (headBone) {
       const headRig = new THREE.Group();
       headRig.name = 'metaverse_head_rig';
-      // Armature scale is 0.01 in gltf, so compensate by 100 for normal sizing
       headRig.scale.setScalar(100);
 
-      // 1. Warm Peach Clay Skin & Smiling Face
+      // Warm Peach Clay Skin & Smiling Face
       const skinMat = new THREE.MeshStandardMaterial({
         color: 0xffedd5,
         roughness: 0.65,
@@ -158,16 +179,16 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
       smile.position.set(0, 0.02, 0.135);
       headRig.add(smile);
 
-      // Cute button nose
+      // Button nose
       const noseGeo = new THREE.SphereGeometry(0.012, 12, 12);
       const nose = new THREE.Mesh(noseGeo, skinMat);
       nose.position.set(0, 0.05, 0.14);
       headRig.add(nose);
 
-      // 2. VR Headset Frame
+      // VR Headset Frame
       const visorFrameGeo = new THREE.BoxGeometry(0.24, 0.11, 0.12);
       const visorFrameMat = new THREE.MeshStandardMaterial({
-        color: frameColor,
+        color: palette.frameColor,
         roughness: 0.25,
         metalness: 0.15,
       });
@@ -178,8 +199,8 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
       // Glowing Holographic Screen
       const screenGeo = new THREE.BoxGeometry(0.21, 0.08, 0.02);
       const screenMat = new THREE.MeshStandardMaterial({
-        color: visorScreenColor,
-        emissive: visorEmissive,
+        color: palette.visorScreenColor,
+        emissive: palette.visorEmissive,
         emissiveIntensity: 0.95,
         roughness: 0.08,
         metalness: 0.9,
@@ -188,7 +209,7 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
       screen.position.set(0, 0.11, 0.155);
       headRig.add(screen);
 
-      // Glass Reflection Highlight Strip
+      // Glass Reflection Highlight
       const glintGeo = new THREE.BoxGeometry(0.04, 0.06, 0.005);
       const glintMat = new THREE.MeshBasicMaterial({
         color: 0xffffff,
@@ -203,7 +224,7 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
       // Audio Ear Cups
       const earGeo = new THREE.CylinderGeometry(0.048, 0.048, 0.035, 24);
       const earMat = new THREE.MeshStandardMaterial({
-        color: earColor,
+        color: palette.earColor,
         roughness: 0.3,
         metalness: 0.25,
       });
@@ -219,7 +240,7 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
       // Headband strap
       const strapGeo = new THREE.TorusGeometry(0.125, 0.015, 12, 24, Math.PI);
       const strapMat = new THREE.MeshStandardMaterial({
-        color: jointColor,
+        color: palette.jointColor,
         roughness: 0.6,
       });
       const strap = new THREE.Mesh(strapGeo, strapMat);
@@ -227,9 +248,9 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
       strap.position.set(0, 0.11, 0);
       headRig.add(strap);
 
-      // 3. Stylized Clay Hairstyle
+      // Stylized Clay Hairstyle
       const hairMat = new THREE.MeshStandardMaterial({
-        color: hairColor,
+        color: palette.hairColor,
         roughness: 0.8,
         metalness: 0.05,
       });
@@ -268,12 +289,12 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
       headBone.add(headRig);
     }
 
-    // Attach Sleek Oval Kneepads to Knee Bones
+    // Attach Sleek Oval Kneepads
     const leftKnee = clone.getObjectByName('mixamorigLeftLeg');
     const rightKnee = clone.getObjectByName('mixamorigRightLeg');
     if (leftKnee && rightKnee) {
       const padMat = new THREE.MeshStandardMaterial({
-        color: jointColor,
+        color: palette.jointColor,
         roughness: 0.5,
         metalness: 0.25,
       });
@@ -290,7 +311,7 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
     }
 
     return clone;
-  }, [scene, identity]);
+  }, [scene, palette, identity]);
 
   // Hook up skeletal animation mixer
   const { actions } = useAnimations(animations, groupRef);
@@ -299,7 +320,6 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
   useEffect(() => {
     if (!actions) return;
 
-    // Available clips in xbot: 'idle', 'walk', 'run', 'agree', 'headShake', 'sad_pose', 'sneak_pose'
     let targetAction = 'idle';
 
     if (isSitting || currentAction === 'sit') {
@@ -320,39 +340,150 @@ export const AvatarModel: React.FC<AvatarModelProps> = ({
       targetAction = 'idle';
     }
 
-    // Fade into target clip
     const current = actions[targetAction];
     if (current) {
       current.reset().fadeIn(0.2).play();
     }
 
-    // Fade out other clips
     Object.keys(actions).forEach((key) => {
       if (key !== targetAction && actions[key]?.isRunning()) {
         actions[key]?.fadeOut(0.2);
       }
     });
-
-    return () => {
-      // cleanup
-    };
   }, [actions, isMoving, isRunning, isSitting, currentAction, isTurntablePreview]);
 
-  // Frame loop for floating holographic accessories and turntable spin
   useFrame((_, delta) => {
     animTimeRef.current += delta;
-
-    // Floating Holographic Cyber Shield spin & hover
-    if (holoShieldRef.current) {
-      holoShieldRef.current.rotation.z += delta * 0.8;
-      holoShieldRef.current.position.y = 0.95 + Math.sin(animTimeRef.current * 3) * 0.03;
-    }
   });
 
   return (
     <group ref={groupRef} dispose={null}>
-      {/* 3D Skinned Mesh Humanoid */}
       <primitive object={clonedScene} scale={0.95} position={[0, isSitting ? -0.35 : 0, 0]} />
+    </group>
+  );
+};
+
+/**
+ * 2. INSTANT ZERO-LATENCY FALLBACK MESH
+ * Renders immediately while GLB is downloading or if network fails, preventing any black screen.
+ */
+const FallbackStylizedAvatar: React.FC<AvatarModelProps> = ({
+  identity,
+  isMoving = false,
+  isSitting = false,
+}) => {
+  const groupRef = useRef<THREE.Group>(null);
+  const palette = useMemo(() => getIdentityPalette(identity), [identity]);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      const t = state.clock.getElapsedTime();
+      if (isMoving) {
+        groupRef.current.position.y = Math.sin(t * 10) * 0.05 + (isSitting ? -0.35 : 0);
+      } else {
+        groupRef.current.position.y = Math.sin(t * 2) * 0.02 + (isSitting ? -0.35 : 0);
+      }
+    }
+  });
+
+  return (
+    <group ref={groupRef} position={[0, isSitting ? -0.35 : 0, 0]}>
+      {/* Torso & Suit */}
+      <mesh position={[0, 0.95, 0]} castShadow>
+        <capsuleGeometry args={[0.2, 0.45, 8, 16]} />
+        <meshStandardMaterial color={palette.bodyColor} roughness={0.35} metalness={0.15} />
+      </mesh>
+
+      {/* Head */}
+      <group position={[0, 1.45, 0]}>
+        {/* Face */}
+        <mesh position={[0, -0.04, 0]}>
+          <sphereGeometry args={[0.13, 24, 24]} />
+          <meshStandardMaterial color={0xffedd5} roughness={0.65} />
+        </mesh>
+        {/* VR Visor */}
+        <mesh position={[0, 0.02, 0.08]}>
+          <boxGeometry args={[0.24, 0.11, 0.12]} />
+          <meshStandardMaterial color={palette.frameColor} roughness={0.25} />
+        </mesh>
+        <mesh position={[0, 0.02, 0.145]}>
+          <boxGeometry args={[0.21, 0.08, 0.02]} />
+          <meshStandardMaterial
+            color={palette.visorScreenColor}
+            emissive={palette.visorEmissive}
+            emissiveIntensity={0.9}
+            roughness={0.1}
+          />
+        </mesh>
+        {/* Hair */}
+        <mesh position={[0, 0.08, -0.02]}>
+          <sphereGeometry args={[0.14, 16, 16]} />
+          <meshStandardMaterial color={palette.hairColor} roughness={0.8} />
+        </mesh>
+      </group>
+
+      {/* Limbs */}
+      <mesh position={[-0.1, 0.45, 0]}>
+        <capsuleGeometry args={[0.07, 0.45, 8, 12]} />
+        <meshStandardMaterial color={palette.bodyColor} roughness={0.35} />
+      </mesh>
+      <mesh position={[0.1, 0.45, 0]}>
+        <capsuleGeometry args={[0.07, 0.45, 8, 12]} />
+        <meshStandardMaterial color={palette.bodyColor} roughness={0.35} />
+      </mesh>
+    </group>
+  );
+};
+
+/**
+ * 3. ERROR BOUNDARY
+ * Catches any potential GLTF load / decode error and falls back to stylized mesh safely.
+ */
+class ModelErrorBoundary extends Component<
+  { fallback: ReactNode; children: ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { fallback: ReactNode; children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.warn('GLBAvatar load error caught by boundary, using fallback:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
+}
+
+/**
+ * 4. EXPORTED COMPONENT
+ */
+export const AvatarModel: React.FC<AvatarModelProps> = (props) => {
+  const holoShieldRef = useRef<THREE.Group>(null);
+
+  useFrame((_, delta) => {
+    if (holoShieldRef.current) {
+      holoShieldRef.current.rotation.z += delta * 0.8;
+      holoShieldRef.current.position.y = 0.95 + Math.sin(Date.now() * 0.003) * 0.03;
+    }
+  });
+
+  return (
+    <group>
+      <ModelErrorBoundary fallback={<FallbackStylizedAvatar {...props} />}>
+        <Suspense fallback={<FallbackStylizedAvatar {...props} />}>
+          <GLBAvatar {...props} />
+        </Suspense>
+      </ModelErrorBoundary>
 
       {/* Floating Holographic Cyber Shield (as in reference image) */}
       <group
