@@ -9,7 +9,6 @@ import { useMultiplayerStore } from '@/stores/useMultiplayerStore';
 import { resolveCollision } from '@/game/collision/collisionSystem';
 import { localAvatarState } from '@/game/avatarState';
 import { AvatarModel } from './AvatarModel';
-import { VISITOR_IDENTITIES } from '@/features/visitor/identityData';
 import { CHARACTER_ACTIONS } from '@/features/character/characterActions';
 
 interface AvatarProps {
@@ -24,7 +23,6 @@ export const Avatar: React.FC<AvatarProps> = ({ positionRef }) => {
   const moveVector = useInputStore((state) => state.moveVector);
   const isRunning = useInputStore((state) => state.isRunning);
   const visitorIdentity = useGameStore((state) => state.visitorIdentity);
-  const visitorNickname = useGameStore((state) => state.visitorNickname);
 
   const isSittingOnSofa = useRoomStateStore((state) => state.isSittingOnSofa);
   const setSittingOnSofa = useRoomStateStore((state) => state.setSittingOnSofa);
@@ -38,7 +36,6 @@ export const Avatar: React.FC<AvatarProps> = ({ positionRef }) => {
   const [inputX, inputZ] = moveVector;
   const isMoving = inputX !== 0 || inputZ !== 0;
 
-  const identityConfig = VISITOR_IDENTITIES[visitorIdentity] || VISITOR_IDENTITIES.visitor;
   const activeActionDef = localAction ? CHARACTER_ACTIONS[localAction] : null;
 
   // Sync sofa state with local sitting
@@ -145,40 +142,33 @@ export const Avatar: React.FC<AvatarProps> = ({ positionRef }) => {
         isSitting={isLocalSitting || isSittingOnSofa}
       />
 
-      {/* Floating 3D Speech Bubble & Emote Feedback above Local Avatar */}
-      <Html
-        position={[0, 1.95, 0]}
-        center
-        distanceFactor={7}
-        zIndexRange={[10, 0]}
-        className="pointer-events-none select-none"
-      >
-        <div className="flex flex-col items-center">
-          {/* Active Speech Bubble */}
-          {localChatMessage && (
-            <div className="mb-2 max-w-[240px] px-3 py-1.5 rounded-2xl bg-white text-slate-900 border-2 border-sky-400 shadow-2xl text-xs font-medium text-center animate-bounce-short">
-              <span>{localChatMessage}</span>
-              {/* Speech pointer */}
-              <div className="w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-white mx-auto -mb-2 mt-0.5" />
-            </div>
-          )}
+      {/* Floating 3D Speech Bubble & Emote Feedback above Local Avatar (only when active) */}
+      {(localChatMessage || activeActionDef) && (
+        <Html
+          position={[0, 2.1, 0]}
+          center
+          zIndexRange={[10, 0]}
+          className="pointer-events-none select-none"
+        >
+          <div className="flex flex-col items-center">
+            {/* Active Speech Bubble */}
+            {localChatMessage && (
+              <div className="mb-2 max-w-[220px] px-3 py-1.5 rounded-2xl bg-white text-slate-900 border-2 border-sky-400 shadow-2xl text-xs font-medium text-center animate-bounce-short">
+                <span>{localChatMessage}</span>
+                <div className="w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-white mx-auto -mb-2 mt-0.5" />
+              </div>
+            )}
 
-          {/* Active Action Emote Badge */}
-          {activeActionDef && (
-            <div className="mb-1.5 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-900 font-bold text-[11px] shadow-lg animate-pulse">
-              <span>{activeActionDef.emoji}</span>
-              <span>{activeActionDef.labelVi}</span>
-            </div>
-          )}
-
-          {/* Local Name Badge */}
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-900/80 text-white border border-sky-400/30 text-[10px] backdrop-blur-md">
-            <span>{identityConfig.badge}</span>
-            <span className="font-semibold">{visitorNickname || 'You'}</span>
-            <span className="text-[9px] text-sky-300 font-mono">({identityConfig.nameVi})</span>
+            {/* Active Action Emote Badge */}
+            {activeActionDef && (
+              <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-900 font-bold text-[11px] shadow-lg animate-pulse">
+                <span>{activeActionDef.emoji}</span>
+                <span>{activeActionDef.labelVi}</span>
+              </div>
+            )}
           </div>
-        </div>
-      </Html>
+        </Html>
+      )}
     </group>
   );
 };

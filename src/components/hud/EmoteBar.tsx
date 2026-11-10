@@ -58,7 +58,7 @@ export const EmoteBar: React.FC = () => {
   return (
     <>
       {/* Floating Action Bar Button on Bottom Right HUD */}
-      <div className="fixed bottom-6 right-6 z-30 flex items-center gap-2">
+      <div className="fixed bottom-6 right-6 z-30 flex items-center gap-2 pointer-events-auto">
         {/* Quick Sit / Stand Button */}
         <button
           onClick={toggleLocalSitting}
@@ -93,7 +93,7 @@ export const EmoteBar: React.FC = () => {
 
       {/* Expanded Action & Emote Menu Drawer */}
       {isEmoteBarOpen && (
-        <div className="fixed bottom-20 right-6 z-30 w-80 sm:w-96 rounded-2xl bg-slate-950/95 border border-sky-400/30 shadow-2xl backdrop-blur-xl p-4 animate-scale-in text-white">
+        <div className="fixed bottom-20 right-6 z-30 w-80 sm:w-96 rounded-2xl bg-slate-950/95 border border-sky-400/30 shadow-2xl backdrop-blur-xl p-4 animate-scale-in text-white pointer-events-auto">
           {/* Header */}
           <div className="flex items-center justify-between pb-3 border-b border-white/10">
             <div className="flex items-center gap-2">
