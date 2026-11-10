@@ -22,7 +22,16 @@
     - **Universal:** Vẫy tay chào 👋 (`wave`), Vỗ tay khen ngợi 👏 (`applause`), Ngồi xuống / Đứng lên 🪑 (`sit`), Cười vui vẻ 😄 (`laugh`), Nhảy ăn mừng 🕺 (`dance`).
   - Smart Seating System: Phím `[F]` hoặc tương tác trực tiếp với Ghế bàn làm việc (Ergonomic Desk Chair) hoặc Ghế Sofa (Sectional Sofa) hoặc ngồi thư giãn tại chỗ. Tự động thoát va chạm và cho phép di chuyển mượt mà ngay khi đứng dậy.
 - **Phase 6 — Architectural Visual Overhaul & Stylized 3D Character Aesthetics: PASS**
-  - **Character Redesign:** Thay thế toàn bộ hình khối hộp thô sơ dạng Lego bằng nhân vật Stylized mượt mà (Pixar/Chibi Indie Art Style): đầu bo tròn tự nhiên, mắt anime sinh động có specular catchlight & má hồng, tóc điêu khắc từng lọn có form dáng riêng, thân capsule thon thả, cánh tay/bàn tay bo khớp tự nhiên, quần ống suông và giày sneaker đế cong thời trang.
+  - **SkinnedMesh GLB Character Engine (Option 2):** Thay thế toàn bộ hình khối lego/cylinder thô sơ bằng mô hình 3D thực thụ dạng SkinnedMesh (`/models/xbot.glb`) tích hợp khung xương armature và bộ animation mocap chuẩn quốc tế (`idle`, `walk`, `run`, `agree`, `headShake`, `sad_pose`, `sneak_pose`).
+  - **Metaverse VR Avatar Styling (Pixar / Clay Aesthetic):** Tạo hình đồng nhất theo phong cách tham chiếu:
+    - Kính VR Headset công nghệ cao với khung trắng, màn hình kính cong Holographic màu xanh Cyan phát quang rực rỡ và vệt phản chiếu gương kính.
+    - Đệm tai nghe Over-ear màu tím Neon đặc trưng.
+    - Mái tóc đất sét (clay hair) màu nâu hạt dẻ bồng bềnh vuốt nhọn tự nhiên.
+    - Khuôn mặt tròn đất sét mềm mại, má ửng và nụ cười tươi thân thiện gắn chuẩn theo xương đầu `mixamorigHead`.
+    - Bộ tech jumpsuit thể thao ôm dáng, đệm khớp và ốp bảo hộ đầu gối bo tròn (oval kneepads) chuẩn tỉ lệ.
+    - Khiên năng lượng Holographic Cyber Shield xoay lơ lửng bên cạnh nhân vật.
+  - **Multiplayer Skeleton Isolation:** Sử dụng `SkeletonUtils.clone` đảm bảo mọi khách truy cập (Local Player & Co-visitors) hoạt động độc lập không bị trùng lặp xương hay animation.
+  - **Live Deployment:** Đã biên dịch production sạch lỗi và phát hành trực tiếp lên GitHub Pages (`https://mrnvdong.github.io/the-room/`).
   - **Role-Specific Wardrobe & Details:**
     - Recruiter: Bộ suit may đo lịch lãm, cà vạt kèm kẹp vàng, tay xách vali tài liệu da bóng.
     - Partner: Kính thực tế tăng cường AR Glowing Cyan, cầm máy tính bảng hiển thị mã code.
