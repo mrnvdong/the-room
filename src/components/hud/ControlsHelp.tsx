@@ -60,6 +60,24 @@ export const ControlsHelp: React.FC<ControlsHelpProps> = ({ onClose }) => {
                 </span>
               </div>
               <div className="flex items-center justify-between p-2 rounded bg-slate-800/50">
+                <span className="text-slate-300">Sit Down / Stand Up</span>
+                <span className="font-mono text-xs bg-slate-700 px-2 py-1 rounded text-amber-300 font-semibold">
+                  F Key
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-slate-800/50">
+                <span className="text-slate-300">Character Actions & Emotes</span>
+                <span className="font-mono text-xs bg-slate-700 px-2 py-1 rounded text-sky-300 font-semibold">
+                  B Key
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-slate-800/50">
+                <span className="text-slate-300">Real-Time Room Chat</span>
+                <span className="font-mono text-xs bg-slate-700 px-2 py-1 rounded text-emerald-300 font-semibold">
+                  C or Enter
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded bg-slate-800/50">
                 <span className="text-slate-300">Close Panel / Dismiss</span>
                 <span className="font-mono text-xs bg-slate-700 px-2 py-1 rounded text-sky-300 font-semibold">
                   Esc Key

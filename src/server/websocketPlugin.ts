@@ -10,6 +10,10 @@ interface PlayerData {
   rotationY: number;
   isMoving: boolean;
   isRunning: boolean;
+  currentAction?: string | null;
+  actionStartTime?: number;
+  isSitting?: boolean;
+  chatMessage?: string | null;
   lastSeen: number;
 }
 
@@ -144,6 +148,10 @@ export function presenceWebSocketPlugin(): Plugin {
                 rotationY: msg.rotationY || 0,
                 isMoving: msg.isMoving || false,
                 isRunning: msg.isRunning || false,
+                currentAction: msg.currentAction || null,
+                actionStartTime: msg.actionStartTime,
+                isSitting: Boolean(msg.isSitting),
+                chatMessage: msg.chatMessage || null,
                 lastSeen: Date.now(),
               };
 
@@ -153,6 +161,44 @@ export function presenceWebSocketPlugin(): Plugin {
               const payload = JSON.stringify({
                 type: 'UPDATE',
                 player: playerData,
+              });
+
+              wss.clients.forEach((client) => {
+                if (client !== ws && client.readyState === WebSocket.OPEN) {
+                  client.send(payload);
+                }
+              });
+            } else if (msg.type === 'CHAT') {
+              const sender = players.get(clientId);
+              const nickname = sender?.data.nickname || msg.nickname || 'Visitor';
+              const identity = sender?.data.identity || msg.identity || 'visitor';
+              const payload = JSON.stringify({
+                type: 'CHAT',
+                senderId: clientId,
+                nickname,
+                identity,
+                text: msg.text || '',
+                timestamp: msg.timestamp || Date.now(),
+              });
+
+              wss.clients.forEach((client) => {
+                if (client !== ws && client.readyState === WebSocket.OPEN) {
+                  client.send(payload);
+                }
+              });
+            } else if (msg.type === 'ACTION') {
+              const sender = players.get(clientId);
+              if (sender) {
+                sender.data.currentAction = msg.action;
+                sender.data.actionStartTime = msg.actionStartTime || Date.now();
+                sender.data.isSitting = Boolean(msg.isSitting);
+              }
+              const payload = JSON.stringify({
+                type: 'ACTION',
+                senderId: clientId,
+                action: msg.action,
+                actionStartTime: msg.actionStartTime || Date.now(),
+                isSitting: Boolean(msg.isSitting),
               });
 
               wss.clients.forEach((client) => {

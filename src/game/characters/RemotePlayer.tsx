@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { RemotePlayer as RemotePlayerType } from '@/stores/useMultiplayerStore';
 import { AvatarModel } from './AvatarModel';
 import { VISITOR_IDENTITIES } from '@/features/visitor/identityData';
+import { CHARACTER_ACTIONS } from '@/features/character/characterActions';
 
 interface RemotePlayerProps {
   player: RemotePlayerType;
@@ -18,6 +19,11 @@ export const RemotePlayer: React.FC<RemotePlayerProps> = ({ player }) => {
   const identityConfig =
     VISITOR_IDENTITIES[player.identity] || VISITOR_IDENTITIES.visitor;
 
+  const activeActionDef = player.currentAction ? CHARACTER_ACTIONS[player.currentAction] : null;
+  const isChatVisible = Boolean(
+    player.chatMessage && (!player.chatExpiresAt || player.chatExpiresAt > Date.now())
+  );
+
   useFrame((_, delta) => {
     if (!groupRef.current) return;
 
@@ -27,7 +33,7 @@ export const RemotePlayer: React.FC<RemotePlayerProps> = ({ player }) => {
     groupRef.current.position.copy(currentPos.current);
 
     // 2. Smooth rotation towards movement facing angle
-    if (player.isMoving && player.rotationY !== undefined) {
+    if (player.rotationY !== undefined) {
       let diff = player.rotationY - currentRotY.current;
       while (diff < -Math.PI) diff += Math.PI * 2;
       while (diff > Math.PI) diff -= Math.PI * 2;
@@ -38,14 +44,17 @@ export const RemotePlayer: React.FC<RemotePlayerProps> = ({ player }) => {
 
   return (
     <group ref={groupRef} position={player.position}>
-      {/* 3D Model with identity styling & limb oscillation */}
+      {/* 3D Model with identity styling, action poses, and limb kinematics */}
       <AvatarModel
         identity={player.identity}
         isMoving={player.isMoving}
         isRunning={player.isRunning}
+        currentAction={player.currentAction}
+        actionStartTime={player.actionStartTime}
+        isSitting={player.isSitting}
       />
 
-      {/* Floating 3D Nametag & Role Badge above player's head */}
+      {/* Floating 3D Speech Bubble, Action Badge & Nametag above player's head */}
       <Html
         position={[0, 1.95, 0]}
         center
@@ -54,6 +63,23 @@ export const RemotePlayer: React.FC<RemotePlayerProps> = ({ player }) => {
         className="pointer-events-none select-none"
       >
         <div className="flex flex-col items-center animate-fade-in">
+          {/* Real-time In-Room Speech Bubble */}
+          {isChatVisible && (
+            <div className="mb-2 max-w-[240px] px-3 py-1.5 rounded-2xl bg-white text-slate-900 border-2 border-emerald-400 shadow-2xl text-xs font-semibold text-center animate-bounce-short">
+              <span>{player.chatMessage}</span>
+              <div className="w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-white mx-auto -mb-2 mt-0.5" />
+            </div>
+          )}
+
+          {/* Active Emote Action Badge */}
+          {activeActionDef && (
+            <div className="mb-1.5 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-900 font-bold text-[11px] shadow-lg animate-pulse">
+              <span>{activeActionDef.emoji}</span>
+              <span>{activeActionDef.labelVi}</span>
+            </div>
+          )}
+
+          {/* Nametag & Role Badge */}
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/90 text-white border border-sky-400/40 shadow-xl backdrop-blur-md whitespace-nowrap">
             <span className="text-xs">{identityConfig.badge}</span>
             <span className="text-[11px] font-bold text-white tracking-wide">

@@ -11,6 +11,10 @@ interface WorkerPlayerData {
   rotationY: number;
   isMoving: boolean;
   isRunning: boolean;
+  currentAction?: string | null;
+  actionStartTime?: number;
+  isSitting?: boolean;
+  chatMessage?: string | null;
   lastSeen: number;
 }
 
@@ -69,6 +73,10 @@ export class PresenceRoom {
             rotationY: typeof msg.rotationY === 'number' ? msg.rotationY : 0,
             isMoving: Boolean(msg.isMoving),
             isRunning: Boolean(msg.isRunning),
+            currentAction: typeof msg.currentAction === 'string' ? msg.currentAction : null,
+            actionStartTime: typeof msg.actionStartTime === 'number' ? msg.actionStartTime : undefined,
+            isSitting: Boolean(msg.isSitting),
+            chatMessage: typeof msg.chatMessage === 'string' ? msg.chatMessage : null,
             lastSeen: Date.now(),
           };
 
@@ -81,6 +89,49 @@ export class PresenceRoom {
           });
 
           this.broadcast(server, payload);
+        } else if (msg.type === 'CHAT') {
+          const session = this.sessions.get(server);
+          const nickname = session?.data.nickname || (typeof msg.nickname === 'string' ? msg.nickname : 'Visitor');
+          const identity = session?.data.identity || (typeof msg.identity === 'string' ? msg.identity : 'visitor');
+          const text = typeof msg.text === 'string' ? msg.text : '';
+
+          if (session) {
+            session.data.chatMessage = text;
+          }
+
+          this.broadcast(
+            server,
+            JSON.stringify({
+              type: 'CHAT',
+              senderId: clientId,
+              nickname,
+              identity,
+              text,
+              timestamp: typeof msg.timestamp === 'number' ? msg.timestamp : Date.now(),
+            })
+          );
+        } else if (msg.type === 'ACTION') {
+          const session = this.sessions.get(server);
+          const action = typeof msg.action === 'string' ? msg.action : null;
+          const actionStartTime = typeof msg.actionStartTime === 'number' ? msg.actionStartTime : Date.now();
+          const isSitting = Boolean(msg.isSitting);
+
+          if (session) {
+            session.data.currentAction = action;
+            session.data.actionStartTime = actionStartTime;
+            session.data.isSitting = isSitting;
+          }
+
+          this.broadcast(
+            server,
+            JSON.stringify({
+              type: 'ACTION',
+              senderId: clientId,
+              action,
+              actionStartTime,
+              isSitting,
+            })
+          );
         } else if (msg.type === 'LEAVE') {
           this.sessions.delete(server);
           this.broadcast(

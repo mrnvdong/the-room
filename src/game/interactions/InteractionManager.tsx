@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { useInteractionStore } from '@/stores/useInteractionStore';
 import { useInputStore } from '@/stores/useInputStore';
 import { useRoomStateStore } from '@/stores/useRoomStateStore';
+import { useMultiplayerStore } from '@/stores/useMultiplayerStore';
 import { useExplorationStore, EXPLORATION_ZONES } from '@/stores/useExplorationStore';
 import { soundManager } from '@/features/audio/soundManager';
 import { InteractableObject } from '@/types';
@@ -71,6 +72,15 @@ export const InteractionManager: React.FC<InteractionManagerProps> = ({ avatarPo
         position: [-5.5, 0.8, -3.5],
         radius: 1.5,
         action: 'drink_coffee',
+        category: 'desk',
+      },
+      {
+        id: 'desk.chair',
+        displayName: 'Ergonomic Desk Chair',
+        description: 'Take a seat at the main workstation.',
+        position: [-4.7, 0.5, -2.0],
+        radius: 1.8,
+        action: 'sit_desk_chair',
         category: 'desk',
       },
       {
@@ -211,9 +221,18 @@ export const InteractionManager: React.FC<InteractionManagerProps> = ({ avatarPo
           return;
         }
 
+        if (activeNearObject.id === 'desk.chair') {
+          soundManager.playInteractBeep();
+          const isSitting = useMultiplayerStore.getState().isLocalSitting;
+          useMultiplayerStore.getState().setLocalSitting(!isSitting);
+          return;
+        }
+
         if (activeNearObject.id === 'lounge.sofa') {
           soundManager.playInteractBeep();
-          setSittingOnSofa(!isSittingOnSofa);
+          const next = !isSittingOnSofa;
+          setSittingOnSofa(next);
+          useMultiplayerStore.getState().setLocalSitting(next);
           return;
         }
 

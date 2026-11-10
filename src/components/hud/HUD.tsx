@@ -4,6 +4,8 @@ import { MultiplayerBadge } from './MultiplayerBadge';
 import { MultiplayerToasts } from './MultiplayerToasts';
 import { InteractionPrompt } from './InteractionPrompt';
 import { ControlsHelp } from './ControlsHelp';
+import { InRoomChat } from './InRoomChat';
+import { EmoteBar } from './EmoteBar';
 import { MobileControls } from '../mobile/MobileControls';
 import { Modal } from '../ui/Modal';
 import { AdminModal } from '../admin/AdminModal';
@@ -243,6 +245,12 @@ export const HUD: React.FC = () => {
 
       {/* Multiplayer Join/Leave Notifications */}
       <MultiplayerToasts />
+
+      {/* Real-time In-Room Chat & Preset Phrases */}
+      <InRoomChat />
+
+      {/* Character Habits, Actions & Emotes Bar */}
+      <EmoteBar />
 
       {/* Center Bottom: Contextual Interaction Prompt (Desktop or Tablet) */}
       <div className="flex justify-center w-full mb-8 pointer-events-none">

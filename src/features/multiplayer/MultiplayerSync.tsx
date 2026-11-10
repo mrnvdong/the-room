@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { useGameStore } from '@/stores/useGameStore';
-import { useMultiplayerStore, RemotePlayer } from '@/stores/useMultiplayerStore';
+import {
+  useMultiplayerStore,
+  RemotePlayer,
+  InRoomChatMessage,
+} from '@/stores/useMultiplayerStore';
 import { localAvatarState } from '@/game/avatarState';
 import { getWebSocketUrl } from '@/config/api';
 
@@ -15,6 +19,7 @@ export const MultiplayerSync: React.FC = () => {
   const cleanStalePlayers = useMultiplayerStore(
     (state) => state.cleanStalePlayers
   );
+  const addChatMessage = useMultiplayerStore((state) => state.addChatMessage);
 
   const socketRef = useRef<WebSocket | null>(null);
   const channelRef = useRef<BroadcastChannel | null>(null);
@@ -25,6 +30,27 @@ export const MultiplayerSync: React.FC = () => {
   const visitorNicknameRef = useRef(useGameStore.getState().visitorNickname);
   const visitorIdentityRef = useRef(useGameStore.getState().visitorIdentity);
   const gameStateRef = useRef(useGameStore.getState().gameState);
+
+  const localActionRef = useRef(useMultiplayerStore.getState().localAction);
+  const localActionStartTimeRef = useRef(
+    useMultiplayerStore.getState().localActionStartTime
+  );
+  const isLocalSittingRef = useRef(
+    useMultiplayerStore.getState().isLocalSitting
+  );
+  const localChatMessageRef = useRef(
+    useMultiplayerStore.getState().localChatMessage
+  );
+
+  const sendPayload = useCallback((payload: Record<string, unknown>) => {
+    const json = JSON.stringify(payload);
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(json);
+    }
+    if (channelRef.current) {
+      channelRef.current.postMessage(payload);
+    }
+  }, []);
 
   const broadcastUpdate = useCallback(
     (isMoving = false, isRunning = false) => {
@@ -38,19 +64,18 @@ export const MultiplayerSync: React.FC = () => {
         rotationY: localAvatarState.rotationY,
         isMoving,
         isRunning,
+        currentAction: localActionRef.current,
+        actionStartTime: localActionStartTimeRef.current,
+        isSitting: isLocalSittingRef.current,
+        chatMessage: localChatMessageRef.current,
       };
 
-      if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-        socketRef.current.send(JSON.stringify(payload));
-      }
-      if (channelRef.current) {
-        channelRef.current.postMessage(payload);
-      }
+      sendPayload(payload);
     },
-    [myClientId]
+    [myClientId, sendPayload]
   );
 
-  // Subscribe to store updates without resetting connection
+  // Subscribe to useGameStore
   useEffect(() => {
     const unsub = useGameStore.subscribe((state) => {
       const prevGameState = gameStateRef.current;
@@ -58,13 +83,54 @@ export const MultiplayerSync: React.FC = () => {
       visitorIdentityRef.current = state.visitorIdentity;
       gameStateRef.current = state.gameState;
 
-      // Broadcast immediately when entering EXPLORING
       if (state.gameState === 'EXPLORING' && prevGameState !== 'EXPLORING') {
         broadcastUpdate(false, false);
       }
     });
     return unsub;
   }, [broadcastUpdate]);
+
+  // Subscribe to useMultiplayerStore for Actions & Sitting
+  useEffect(() => {
+    const unsub = useMultiplayerStore.subscribe((state) => {
+      const prevAction = localActionRef.current;
+      const prevSitting = isLocalSittingRef.current;
+      const prevChat = localChatMessageRef.current;
+
+      localActionRef.current = state.localAction;
+      localActionStartTimeRef.current = state.localActionStartTime;
+      isLocalSittingRef.current = state.isLocalSitting;
+      localChatMessageRef.current = state.localChatMessage;
+
+      // Broadcast immediately when action or sitting changes
+      if (
+        state.localAction !== prevAction ||
+        state.isLocalSitting !== prevSitting
+      ) {
+        sendPayload({
+          type: 'ACTION',
+          senderId: myClientId,
+          action: state.localAction,
+          actionStartTime: state.localActionStartTime,
+          isSitting: state.isLocalSitting,
+        });
+        broadcastUpdate(false, false);
+      }
+
+      // Broadcast chat when new local chat is set
+      if (state.localChatMessage && state.localChatMessage !== prevChat) {
+        sendPayload({
+          type: 'CHAT',
+          senderId: myClientId,
+          nickname: visitorNicknameRef.current,
+          identity: visitorIdentityRef.current,
+          text: state.localChatMessage,
+          timestamp: Date.now(),
+        });
+      }
+    });
+    return unsub;
+  }, [myClientId, broadcastUpdate, sendPayload]);
 
   // Main Persistent WebSocket Connection
   useEffect(() => {
@@ -84,7 +150,6 @@ export const MultiplayerSync: React.FC = () => {
           console.log('✓ Connected to Real-Time Presence WebSocket');
           socketRef.current = ws;
 
-          // If already exploring, announce presence immediately
           if (gameStateRef.current === 'EXPLORING') {
             broadcastUpdate(false, false);
           }
@@ -104,6 +169,37 @@ export const MultiplayerSync: React.FC = () => {
             } else if (data.type === 'UPDATE' && data.player) {
               if (data.player.id !== myClientId) {
                 updateRemotePlayer(data.player);
+              }
+            } else if (data.type === 'CHAT' && data.senderId !== myClientId) {
+              // Add to chat log
+              const chatMsg: InRoomChatMessage = {
+                id: `chat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+                senderId: data.senderId,
+                nickname: data.nickname || 'Visitor',
+                identity: data.identity || 'visitor',
+                text: data.text || '',
+                timestamp: data.timestamp || Date.now(),
+              };
+              addChatMessage(chatMsg);
+
+              // Update remote player speech bubble
+              const existing = useMultiplayerStore.getState().remotePlayers.get(data.senderId);
+              if (existing) {
+                updateRemotePlayer({
+                  ...existing,
+                  chatMessage: data.text,
+                  chatExpiresAt: Date.now() + 7000,
+                });
+              }
+            } else if (data.type === 'ACTION' && data.senderId !== myClientId) {
+              const existing = useMultiplayerStore.getState().remotePlayers.get(data.senderId);
+              if (existing) {
+                updateRemotePlayer({
+                  ...existing,
+                  currentAction: data.action,
+                  actionStartTime: data.actionStartTime || Date.now(),
+                  isSitting: Boolean(data.isSitting),
+                });
               }
             } else if (data.type === 'LEAVE' && data.senderId) {
               removeRemotePlayer(data.senderId);
@@ -148,9 +244,43 @@ export const MultiplayerSync: React.FC = () => {
             rotationY: data.rotationY || 0,
             isMoving: data.isMoving || false,
             isRunning: data.isRunning || false,
+            currentAction: data.currentAction,
+            actionStartTime: data.actionStartTime,
+            isSitting: data.isSitting,
+            chatMessage: data.chatMessage,
+            chatExpiresAt: data.chatMessage ? Date.now() + 7000 : undefined,
             lastSeen: Date.now(),
           };
           updateRemotePlayer(player);
+        } else if (data.type === 'CHAT') {
+          const chatMsg: InRoomChatMessage = {
+            id: `chat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+            senderId: data.senderId,
+            nickname: data.nickname || 'Visitor',
+            identity: data.identity || 'visitor',
+            text: data.text || '',
+            timestamp: data.timestamp || Date.now(),
+          };
+          addChatMessage(chatMsg);
+
+          const existing = useMultiplayerStore.getState().remotePlayers.get(data.senderId);
+          if (existing) {
+            updateRemotePlayer({
+              ...existing,
+              chatMessage: data.text,
+              chatExpiresAt: Date.now() + 7000,
+            });
+          }
+        } else if (data.type === 'ACTION') {
+          const existing = useMultiplayerStore.getState().remotePlayers.get(data.senderId);
+          if (existing) {
+            updateRemotePlayer({
+              ...existing,
+              currentAction: data.action,
+              actionStartTime: data.actionStartTime || Date.now(),
+              isSitting: Boolean(data.isSitting),
+            });
+          }
         } else if (data.type === 'LEAVE') {
           removeRemotePlayer(data.senderId);
         }
@@ -158,7 +288,6 @@ export const MultiplayerSync: React.FC = () => {
     }
 
     // Keepalive Heartbeat: Send status every 1.5s
-    // Ensures stationary visitors NEVER disappear from view!
     const heartbeatInterval = setInterval(() => {
       if (gameStateRef.current !== 'EXPLORING') return;
       broadcastUpdate(localAvatarState.isMoving, localAvatarState.isRunning);
@@ -209,6 +338,7 @@ export const MultiplayerSync: React.FC = () => {
     removeRemotePlayer,
     cleanStalePlayers,
     broadcastUpdate,
+    addChatMessage,
   ]);
 
   // Movement loop: 25Hz broadcast
