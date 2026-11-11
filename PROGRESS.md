@@ -48,6 +48,28 @@
     - Cập nhật song ngữ EN/VI trên bảng điều khiển không gian cửa sổ và thanh trạng thái HUD.
 - **Phase 8 — High-Fidelity Architectural Furniture & Hardware Redesign: PASS**
 - **Phase 9 — Photorealistic 3D GLB Furniture & Professional Archetype Overhaul (Phương án 1): PASS**
+- **Phase 10 — Complete Room Objects & Interior Photorealism Overhaul (Xóa Bỏ Triệt Để Khối Hộp Lego): PASS**
+  - **Tủ Server Doanh Nghiệp 42U (`ServerRack.tsx`):**
+    - Thay thế toàn bộ 150+ dòng code hình khối procedual bằng mô hình 3D thực tế `server_rack.glb`.
+    - Vỏ thép dập tấm hoàn thiện sơn tĩnh điện mờ (`metalness: 0.85, roughness: 0.28`), ray trượt module rack, quạt tản nhiệt, ma trận đèn LED tín hiệu I/O nhấp nháy thực tế (`Status Lime` và `Safety Orange` emissive bloom), quầng sáng cool cyan đặc trưng của phòng data center enterprise.
+  - **Tủ Sách / Kệ Kiến Trúc Modular (`Bookshelf.tsx`):**
+    - Thay thế toàn bộ 250+ dòng box geometry bằng hệ thống tủ kệ 3D thực tế `shelf_large.glb` với vân gỗ óc chó cao cấp PBR.
+    - Tích hợp mô hình bình hoa thủy tinh cao cấp `vase_flowers.glb` (Khronos GlassVaseFlowers) với cánh hoa tự nhiên và độ truyền sáng của thủy tinh trên kệ mắt nhìn.
+    - Sắp đặt các bộ sách bìa cứng mạ chữ vàng, sách nghiêng tự nhiên, chặn sách bằng đồng nguyên khối và dải đèn LED âm kệ hắt sáng ấm áp.
+  - **Khu Vực Bàn Trà & Phụ Kiện Phòng Khách (`LoungeArea.tsx`):**
+    - Thay thế bàn trụ hình học procedual bằng bộ bàn trà đôi tròn lồng ghép 3D `table_roundlarge.glb` và `table_roundsmall.glb` với mặt gỗ tự nhiên tinh xảo.
+    - Bổ sung bộ tách trà sứ cao cấp `teacup.glb` (Khronos DiffuseTransmissionTeacup) đặt trực tiếp trên mặt bàn.
+    - Bổ sung bình hoa thủy tinh `vase_flowers.glb` trên bàn góc.
+    - Bổ sung đèn cây đứng cao cấp `light_floor1.glb` với chao đèn hắt ánh sáng vàng ấm cạnh sofa nhung.
+  - **Bàn Làm Việc & Đồ Dùng Phụ Trợ (`DeskSet.tsx`):**
+    - Trang bị đèn bàn làm việc 3D `light_desk.glb` với khớp xoay kim loại và cơ chế bật/tắt công tắc tương tác thực.
+    - Thùng rác văn phòng inox chải xước `trashcan_cylindric.glb` đặt cạnh bàn.
+  - **Cửa Chính Ra Vào Căn Phòng (`RoomShell.tsx`):**
+    - Thay thế cửa khối hộp bằng cánh cửa kiến trúc 3D thực tế `door_1.glb` với tay nắm đồng thau satin sang trọng.
+  - **Kiểm định & Trạng thái Server:**
+    - Zero local dev server chạy nền (cổng 5188 & 5199 đóng hoàn toàn theo chỉ đạo của người dùng).
+    - `npm run typecheck`, `npm test` (8/8 unit tests), `npm run build` hoàn toàn vượt qua.
+    - Đã push lên nhánh `main` (commit `9317166`) và deploy lên `gh-pages` (commit `0adc9f5`).
   - **No More Procedural Lego Blocks:** Replaced all procedural geometric primitives (`boxGeometry`, `cylinderGeometry`) with genuine, photorealistic `.glb` 3D models with PBR materials, textures, and real-life proportions:
     - **Lounge Area (`LoungeArea.tsx`):**
       - `sofa_velvet.glb`: Modern luxury velvet sofa with polished brass legs positioned at `[4.5, 0, 2.7]`, facing the lounge and TV (`rotation.y = Math.PI`).
