@@ -1,4 +1,55 @@
-import React from 'react';
+import React, { Suspense, useMemo } from 'react';
+import * as THREE from 'three';
+import { useGLTF } from '@react-three/drei';
+import { getAssetUrl } from '@/config/assets';
+
+const DOOR_URL = getAssetUrl('models/door_1.glb');
+
+try {
+  useGLTF.preload(DOOR_URL);
+} catch {
+  // Ignore in SSR
+}
+
+/**
+ * Photorealistic Architectural Entrance Door Model
+ */
+const EntranceDoorModel: React.FC = () => {
+  const { scene } = useGLTF(DOOR_URL);
+
+  const clonedScene = useMemo(() => {
+    const clone = scene.clone();
+    clone.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        const mat = mesh.material;
+        if (mat instanceof THREE.MeshStandardMaterial) {
+          if (mesh.name === 'Door_1_2' || mat.name.toLowerCase().includes('metal')) {
+            // Brushed Satin Brass Door Hardware
+            mat.color = new THREE.Color('#d97706');
+            mat.metalness = 0.95;
+            mat.roughness = 0.18;
+          } else {
+            // Rich Dark Walnut Architectural Door Leaf & Architrave
+            mat.color = new THREE.Color('#281c13');
+            mat.roughness = 0.42;
+            mat.metalness = 0.05;
+          }
+        }
+      }
+    });
+    return clone;
+  }, [scene]);
+
+  return (
+    <group position={[0.6, 0, 5.92]} rotation={[0, Math.PI, 0]}>
+      <primitive object={clonedScene} scale={[0.68, 0.68, 0.68]} />
+    </group>
+  );
+};
 
 export const RoomShell: React.FC = () => {
   // Acoustic vertical oak slats array (x from -6.2 to -2.0)
@@ -119,38 +170,25 @@ export const RoomShell: React.FC = () => {
         <meshStandardMaterial color="#181a20" roughness={0.85} />
       </mesh>
 
-      {/* Entrance Doorway Architrave & Threshold */}
-      <group position={[0, 0, 5.95]}>
-        {/* Modern Minimalist Architrave Frame */}
-        <mesh position={[0, 1.4, 0]}>
-          <boxGeometry args={[2.2, 2.8, 0.08]} />
-          <meshStandardMaterial color="#0b0d12" roughness={0.4} metalness={0.7} />
+      {/* Authentic 3D Entrance Door Model */}
+      <Suspense fallback={null}>
+        <EntranceDoorModel />
+      </Suspense>
+
+      {/* Backlit Entrance Threshold Sign */}
+      <group position={[0, 2.7, 5.92]}>
+        <mesh>
+          <boxGeometry args={[1.5, 0.22, 0.02]} />
+          <meshStandardMaterial color="#090a0f" roughness={0.2} metalness={0.8} />
         </mesh>
-        {/* Solid Walnut Door with Sleek Vertical Grooves */}
-        <mesh position={[0, 1.35, 0.02]}>
-          <boxGeometry args={[1.96, 2.66, 0.05]} />
-          <meshStandardMaterial color="#38281d" roughness={0.5} />
+        <mesh position={[0, 0, 0.012]}>
+          <planeGeometry args={[1.42, 0.16]} />
+          <meshStandardMaterial
+            color="#38bdf8"
+            emissive="#0284c7"
+            emissiveIntensity={0.6}
+          />
         </mesh>
-        {/* Architectural Long Brushed Brass Pull Handle */}
-        <mesh position={[0.74, 1.3, 0.07]}>
-          <cylinderGeometry args={[0.016, 0.016, 0.8, 12]} />
-          <meshStandardMaterial color="#fbbf24" metalness={0.9} roughness={0.15} />
-        </mesh>
-        {/* Backlit Brushed Aluminum Nameplate */}
-        <group position={[0, 2.48, 0.06]}>
-          <mesh>
-            <boxGeometry args={[1.5, 0.26, 0.03]} />
-            <meshStandardMaterial color="#090a0f" roughness={0.2} metalness={0.8} />
-          </mesh>
-          <mesh position={[0, 0, 0.018]}>
-            <planeGeometry args={[1.42, 0.2]} />
-            <meshStandardMaterial
-              color="#38bdf8"
-              emissive="#0284c7"
-              emissiveIntensity={0.6}
-            />
-          </mesh>
-        </group>
       </group>
 
       {/* ==================== 5. LEFT WALL (SKYLINE WINDOW AREA) ==================== */}

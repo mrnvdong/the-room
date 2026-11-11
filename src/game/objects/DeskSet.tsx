@@ -5,12 +5,16 @@ import { useRoomStateStore } from '@/stores/useRoomStateStore';
 import { getAssetUrl } from '@/config/assets';
 
 const DESK_MODEL_URL = getAssetUrl('models/desk.glb');
+const DESK_LAMP_URL = getAssetUrl('models/light_desk.glb');
+const TRASHCAN_URL = getAssetUrl('models/trashcan_cylindric.glb');
 const DRACO_URL = getAssetUrl('draco/');
 
 try {
   useGLTF.preload(DESK_MODEL_URL, DRACO_URL);
+  useGLTF.preload(DESK_LAMP_URL);
+  useGLTF.preload(TRASHCAN_URL);
 } catch {
-  // Ignore in SSR/offline
+  // Ignore in SSR
 }
 
 /**
@@ -39,6 +43,85 @@ const PhotorealisticDeskModel: React.FC = () => {
   );
 };
 
+/**
+ * Photorealistic 3D Articulated Desk Lamp (Interactive Toggle)
+ */
+const PhotorealisticDeskLamp: React.FC<{ lampOn: boolean }> = ({ lampOn }) => {
+  const { scene } = useGLTF(DESK_LAMP_URL);
+
+  const clonedScene = useMemo(() => {
+    const clone = scene.clone();
+    clone.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        const mat = mesh.material;
+        if (mat instanceof THREE.MeshStandardMaterial) {
+          if (mesh.name === 'Light_Desk_3' || mat.name.toLowerCase().includes('white')) {
+            mat.color = new THREE.Color(lampOn ? '#fffbeb' : '#475569');
+            mat.emissive = new THREE.Color(lampOn ? '#fef08a' : '#000000');
+            mat.emissiveIntensity = lampOn ? 2.5 : 0;
+          } else if (mat.name.toLowerCase().includes('black')) {
+            mat.color = new THREE.Color('#0f172a');
+            mat.metalness = 0.8;
+            mat.roughness = 0.25;
+          }
+        }
+      }
+    });
+    return clone;
+  }, [scene, lampOn]);
+
+  return (
+    <group position={[-0.72, 0.74, -0.22]} rotation={[0, 0.65, 0]}>
+      <primitive object={clonedScene} scale={[0.62, 0.62, 0.62]} />
+      {lampOn && (
+        <spotLight
+          position={[0, 0.35, 0.15]}
+          target-position={[0.3, 0, 0.2]}
+          color="#fffbeb"
+          intensity={2.8}
+          angle={0.65}
+          penumbra={0.7}
+          distance={3.5}
+        />
+      )}
+    </group>
+  );
+};
+
+/**
+ * Photorealistic Brushed Steel Wastepaper Bin Beside Desk
+ */
+const WasteBinModel: React.FC = () => {
+  const { scene } = useGLTF(TRASHCAN_URL);
+
+  const clonedScene = useMemo(() => {
+    const clone = scene.clone();
+    clone.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        mesh.material = new THREE.MeshStandardMaterial({
+          color: new THREE.Color('#1e293b'),
+          metalness: 0.85,
+          roughness: 0.25,
+        });
+      }
+    });
+    return clone;
+  }, [scene]);
+
+  return (
+    <group position={[-1.15, 0, 0.35]} rotation={[0, 0.2, 0]}>
+      <primitive object={clonedScene} scale={[0.38, 0.38, 0.38]} />
+    </group>
+  );
+};
+
 export const DeskSet: React.FC = () => {
   const deskLampOn = useRoomStateStore((state) => state.deskLampOn);
   const secretDrawerUnlocked = useRoomStateStore((state) => state.secretDrawerUnlocked);
@@ -50,81 +133,18 @@ export const DeskSet: React.FC = () => {
       ========================================================================= */}
       <Suspense fallback={null}>
         <PhotorealisticDeskModel />
+        <PhotorealisticDeskLamp lampOn={deskLampOn} />
+        <WasteBinModel />
       </Suspense>
 
       {/* Under-Desk Designer Wool Runner */}
       <mesh receiveShadow position={[0, 0.005, 0.2]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[2.0, 1.8]} />
+        <planeGeometry args={[2.2, 2.0]} />
         <meshStandardMaterial color="#181c24" roughness={0.9} />
       </mesh>
 
       {/* =========================================================================
-          2. ARCHITECTURAL BALANCED-ARM DESK TASK LAMP (Interactive)
-      ========================================================================= */}
-      <group position={[-0.55, 0.74, -0.2]}>
-        {/* Heavy Cast Iron Base */}
-        <mesh position={[0, 0.012, 0]}>
-          <cylinderGeometry args={[0.07, 0.07, 0.02, 20]} />
-          <meshStandardMaterial color="#1e2532" metalness={0.9} roughness={0.2} />
-        </mesh>
-        {/* Twin Balanced Articulated Arms */}
-        <group position={[0, 0.18, 0]} rotation={[0.2, 0, 0]}>
-          <mesh position={[-0.012, 0, 0]}>
-            <cylinderGeometry args={[0.005, 0.005, 0.35, 10]} />
-            <meshStandardMaterial color="#1e2532" metalness={0.9} />
-          </mesh>
-          <mesh position={[0.012, 0, 0]}>
-            <cylinderGeometry args={[0.005, 0.005, 0.35, 10]} />
-            <meshStandardMaterial color="#1e2532" metalness={0.9} />
-          </mesh>
-        </group>
-        {/* Brass Hinge Joint */}
-        <mesh position={[0, 0.35, 0.07]}>
-          <sphereGeometry args={[0.016, 12, 12]} />
-          <meshStandardMaterial color="#d97706" metalness={0.95} roughness={0.15} />
-        </mesh>
-        {/* Upper Arm Segment */}
-        <group position={[0, 0.48, 0.02]} rotation={[-0.35, 0, 0]}>
-          <mesh>
-            <cylinderGeometry args={[0.006, 0.006, 0.3, 10]} />
-            <meshStandardMaterial color="#1e2532" metalness={0.9} />
-          </mesh>
-        </group>
-        {/* LED Lamp Head */}
-        <group position={[0, 0.6, -0.05]} rotation={[0.4, 0, 0]}>
-          <mesh>
-            <boxGeometry args={[0.18, 0.02, 0.045]} />
-            <meshStandardMaterial
-              color={deskLampOn ? '#fbbf24' : '#64748b'}
-              metalness={0.7}
-              roughness={0.3}
-            />
-          </mesh>
-          {/* LED Diffuser Lens */}
-          <mesh position={[0, -0.011, 0]}>
-            <planeGeometry args={[0.16, 0.035]} />
-            <meshStandardMaterial
-              color="#fffbeb"
-              emissive={deskLampOn ? '#fef08a' : '#000000'}
-              emissiveIntensity={deskLampOn ? 2.5 : 0}
-            />
-          </mesh>
-        </group>
-        {deskLampOn && (
-          <spotLight
-            position={[0, 0.58, -0.05]}
-            target-position={[0, 0, 0]}
-            color="#fffbeb"
-            intensity={2.8}
-            angle={0.65}
-            penumbra={0.7}
-            distance={3.5}
-          />
-        )}
-      </group>
-
-      {/* =========================================================================
-          3. SECRET DRAWER DIGITAL KEYPAD VAULT LOCK (Interactive)
+          2. SECRET DRAWER DIGITAL KEYPAD VAULT LOCK (Interactive)
       ========================================================================= */}
       <group position={[0.55, 0.25, -0.1]}>
         <mesh>
