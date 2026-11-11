@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useInputStore } from '@/stores/useInputStore';
 import { useInteractionStore } from '@/stores/useInteractionStore';
+import { useMultiplayerStore } from '@/stores/useMultiplayerStore';
 
 export const KeyboardController: React.FC = () => {
   const setMoveVector = useInputStore((state) => state.setMoveVector);
@@ -46,6 +47,16 @@ export const KeyboardController: React.FC = () => {
 
       if (e.code === 'KeyE') {
         triggerInteract();
+      }
+
+      if (e.code === 'KeyF') {
+        // Toggle Sit Down / Stand Up shortcut
+        useMultiplayerStore.getState().toggleLocalSitting();
+      }
+
+      if (e.code === 'KeyB') {
+        // Toggle Emotes & Actions Panel shortcut
+        useMultiplayerStore.getState().toggleEmoteBarOpen();
       }
 
       if (e.code === 'Escape' && activeModalObject) {

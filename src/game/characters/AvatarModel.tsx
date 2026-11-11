@@ -407,16 +407,16 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
       if (bones.hips) {
         bones.hips.position.set(0, 0.52, 0.05); // Seated comfortably at chair/cushion height
       }
-      if (bones.leftUpLeg) bones.leftUpLeg.rotation.set(Math.PI / 2.05, 0, 0.05);
-      if (bones.rightUpLeg) bones.rightUpLeg.rotation.set(Math.PI / 2.05, 0, -0.05);
-      if (bones.leftLeg) bones.leftLeg.rotation.set(Math.PI / 2.05, 0, 0);
-      if (bones.rightLeg) bones.rightLeg.rotation.set(Math.PI / 2.05, 0, 0);
-      if (bones.leftFoot) bones.leftFoot.rotation.set(-0.7, 0, 0);
-      if (bones.rightFoot) bones.rightFoot.rotation.set(-0.7, 0, 0);
-      if (bones.leftArm) bones.leftArm.rotation.set(0.7, -0.1, -0.15);
-      if (bones.rightArm) bones.rightArm.rotation.set(0.7, 0.1, 0.15);
-      if (bones.leftForeArm) bones.leftForeArm.rotation.set(-0.35, -0.8, 0.2);
-      if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.35, 0.8, -0.2);
+      if (bones.leftUpLeg) bones.leftUpLeg.rotation.set(-Math.PI / 2, 0, -3.076);
+      if (bones.rightUpLeg) bones.rightUpLeg.rotation.set(-Math.PI / 2, 0, 3.076);
+      if (bones.leftLeg) bones.leftLeg.rotation.set(-Math.PI / 2, 0, 0);
+      if (bones.rightLeg) bones.rightLeg.rotation.set(-Math.PI / 2, 0, 0);
+      if (bones.leftFoot) bones.leftFoot.rotation.set(1.57, 0, 0);
+      if (bones.rightFoot) bones.rightFoot.rotation.set(1.57, 0, 0);
+      if (bones.leftArm) bones.leftArm.rotation.set(0.8, 0.2, 0.2);
+      if (bones.rightArm) bones.rightArm.rotation.set(0.8, -0.2, -0.2);
+      if (bones.leftForeArm) bones.leftForeArm.rotation.set(0.2, 0.5, 0.8);
+      if (bones.rightForeArm) bones.rightForeArm.rotation.set(0.2, -0.5, -0.8);
       return;
     }
 
@@ -433,45 +433,50 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
 
         case 'handshake': {
           if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
-          if (bones.rightArm) bones.rightArm.rotation.set(0.2, 0.3, 0.3 + Math.sin(t * 10) * 0.05);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0.1, -1.1, 0.2);
-          if (bones.spine) bones.spine.rotation.x = 0.08;
+          if (bones.rightArm) bones.rightArm.rotation.set(1.1, -0.4, -1.0);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.2, 0.9, 0.2);
+          if (bones.rightHand) bones.rightHand.rotation.set(-0.1, 0.5, 0.3 + Math.sin(t * 10) * 0.06);
+          if (bones.spine) bones.spine.rotation.x = 0.06;
           break;
         }
 
         case 'applause': {
-          const clap = Math.sin(t * 14) * 0.15;
-          if (bones.leftArm) bones.leftArm.rotation.set(0.6, -0.5 + clap, -0.4);
-          if (bones.leftForeArm) bones.leftForeArm.rotation.set(-0.2, -0.9, 0.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0.6, 0.5 - clap, 0.4);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.2, 0.9, -0.2);
+          const clap = Math.sin(t * 14) * 0.08;
+          if (bones.rightArm) bones.rightArm.rotation.set(0.5, -0.5 + clap, -0.9);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.6, -0.4, -1.5);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.5, 0.5 - clap, 0.9);
+          if (bones.leftForeArm) bones.leftForeArm.rotation.set(-0.6, 0.4, 1.5);
           break;
         }
 
         case 'drink_coffee': {
           if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
           const sip = Math.sin(t * 3);
-          if (bones.rightArm) bones.rightArm.rotation.set(0.4 + sip * 0.1, 0.4, 0.4);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.2, -1.4 + sip * 0.2, 0.3);
-          if (bones.head) bones.head.rotation.x = -sip * 0.12;
+          const sipFactor = Math.max(0, sip);
+          if (bones.rightArm) bones.rightArm.rotation.set(-0.2 - sipFactor * 0.1, 0, -1.3);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-1.3, 0.6, -1.5);
+          if (bones.head) bones.head.rotation.x = -sipFactor * 0.18;
           break;
         }
 
         case 'take_photo': {
-          if (bones.leftArm) bones.leftArm.rotation.set(0.5, -0.5, -0.4);
-          if (bones.leftForeArm) bones.leftForeArm.rotation.set(-0.2, -1.1, 0.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0.5, 0.5, 0.4);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.2, 1.1, -0.2);
-          if (bones.head) bones.head.rotation.x = 0.1;
+          if (bones.rightArm) bones.rightArm.rotation.set(0.4, -0.3, -1.1);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.8, 0.4, -1.4);
+          if (bones.leftArm) bones.leftArm.rotation.set(0.4, 0.3, 1.1);
+          if (bones.leftForeArm) bones.leftForeArm.rotation.set(-0.8, -0.4, 1.4);
+          if (bones.head) bones.head.rotation.x = 0.05;
+          if (propsRefs.flashLight) {
+            propsRefs.flashLight.intensity = Math.sin(t * 6) > 0.85 ? 15 : 0;
+          }
           break;
         }
 
         case 'inspect_cv': {
-          if (bones.leftArm) bones.leftArm.rotation.set(0.5, -0.5, -0.4);
-          if (bones.leftForeArm) bones.leftForeArm.rotation.set(-0.2, -1.0, 0.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0.4, 0.4, 0.3);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.1, 0.8 + Math.sin(t * 4) * 0.12, -0.2);
-          if (bones.head) bones.head.rotation.x = 0.35;
+          if (bones.leftArm) bones.leftArm.rotation.set(0.6, 0.4, 0.8);
+          if (bones.leftForeArm) bones.leftForeArm.rotation.set(-0.6, 0.4, 1.2);
+          if (bones.rightArm) bones.rightArm.rotation.set(0.6, -0.4, -0.8);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.4, -0.3 + Math.sin(t * 4) * 0.12, -1.2);
+          if (bones.head) bones.head.rotation.x = 0.28;
           break;
         }
 
@@ -482,19 +487,21 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
 
         case 'adjust_tie': {
           if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
-          if (bones.rightArm) bones.rightArm.rotation.set(0.4, 0.4, 0.4);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0.1, -1.4 + Math.sin(t * 8) * 0.1, 0.3);
-          if (bones.head) bones.head.rotation.x = 0.2;
+          const adj = Math.sin(t * 8) * 0.04;
+          if (bones.rightArm) bones.rightArm.rotation.set(-0.5 + adj, -0.4, -1.5);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-1.3, 0.6, -1.5);
+          if (bones.head) bones.head.rotation.x = 0.15;
           break;
         }
 
         case 'type_device': {
-          const typeL = Math.sin(t * 16) * 0.08;
-          const typeR = Math.cos(t * 16) * 0.08;
-          if (bones.leftArm) bones.leftArm.rotation.set(0.6, -0.3, -0.3);
-          if (bones.leftForeArm) bones.leftForeArm.rotation.set(-0.1, -1.0 + typeL, 0.2);
-          if (bones.rightArm) bones.rightArm.rotation.set(0.6, 0.3, 0.3);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.1, 1.0 + typeR, -0.2);
+          const tapL = Math.sin(t * 16) * 0.05;
+          const tapR = Math.cos(t * 16) * 0.05;
+          if (bones.leftArm) bones.leftArm.rotation.set(0.7, 0.3, 0.6);
+          if (bones.leftForeArm) bones.leftForeArm.rotation.set(-0.4 + tapL, 0.3, 1.0);
+          if (bones.rightArm) bones.rightArm.rotation.set(0.7, -0.3, -0.6);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.4 + tapR, -0.3, -1.0);
+          if (bones.head) bones.head.rotation.x = 0.22;
           break;
         }
 
@@ -515,8 +522,9 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
 
         case 'high_five': {
           if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
-          if (bones.rightArm) bones.rightArm.rotation.set(-0.3, -0.3, 1.5);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.2, 0);
+          if (bones.rightArm) bones.rightArm.rotation.set(-0.8, -0.4, 0.9);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0.2, 0.2, 0);
+          if (bones.rightHand) bones.rightHand.rotation.set(-0.2, 0.5, 0.2);
           break;
         }
 
@@ -689,15 +697,6 @@ class ModelErrorBoundary extends Component<
  * 4. EXPORTED COMPONENT
  */
 export const AvatarModel: React.FC<AvatarModelProps> = (props) => {
-  const holoShieldRef = useRef<THREE.Group>(null);
-
-  useFrame((_, delta) => {
-    if (holoShieldRef.current) {
-      holoShieldRef.current.rotation.z += delta * 0.8;
-      holoShieldRef.current.position.y = 0.95 + Math.sin(Date.now() * 0.003) * 0.03;
-    }
-  });
-
   return (
     <group>
       <ModelErrorBoundary fallback={<FallbackStylizedAvatar {...props} />}>
@@ -705,41 +704,6 @@ export const AvatarModel: React.FC<AvatarModelProps> = (props) => {
           <GLBAvatar {...props} />
         </Suspense>
       </ModelErrorBoundary>
-
-      {/* Floating Holographic Cyber Shield (as in reference image) */}
-      <group
-        ref={holoShieldRef}
-        position={[0.55, 0.95, 0.15]}
-        rotation={[0.1, -0.4, 0]}
-      >
-        <mesh>
-          <ringGeometry args={[0.14, 0.22, 32]} />
-          <meshBasicMaterial
-            color="#38bdf8"
-            transparent
-            opacity={0.7}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-        <mesh position={[0, 0, -0.005]}>
-          <circleGeometry args={[0.14, 32]} />
-          <meshBasicMaterial
-            color="#0284c7"
-            transparent
-            opacity={0.25}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-        <mesh rotation={[0, 0, Math.PI / 4]}>
-          <ringGeometry args={[0.08, 0.1, 4]} />
-          <meshBasicMaterial
-            color="#a855f7"
-            transparent
-            opacity={0.8}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-      </group>
     </group>
   );
 };

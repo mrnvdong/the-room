@@ -64,7 +64,11 @@
   - **Official Ready Player Me Mocap Animations:** Tích hợp bộ chuyển động chuẩn xương người thật (`M_Standing_Idle_001`, `M_Walk_001`, `M_Run_001`, `M_Talking_Variations_001`, `M_Dances_001`) giúp dáng đi bộ, chạy và đứng thở mượt mà, không bị biến dạng khớp xương.
   - **Third-Person Camera & Kinematics Alignment:**
     - Căn chỉnh góc nhìn thứ 3 từ phía sau lưng nhân vật (nhìn rõ balo và chuyển động bước chân như `video1.mp4`).
-    - Tinh chỉnh tư thế ngồi ghế làm việc và sofa chuẩn xác (hông cao `0.52m`, đùi ngang, gối gập 90°, bàn chân đặt phẳng trên sàn, hai tay đặt tự nhiên).
+    - Loại bỏ hoàn toàn khiên năng lượng ảo (Holographic Cyber Shield) mang phong cách viễn tưởng cũ để nhân vật thuần người thật tự nhiên như video thực tế.
+    - Cân chỉnh toàn diện góc xương khớp Ready Player Me cho tư thế ngồi: đùi vươn thẳng phía trước (`-Math.PI / 2`, `z = ±3.08`), bắp chân gập vuông góc xuống sàn (`-Math.PI / 2`), lòng bàn chân áp phẳng (`1.57 rad`), hai tay đặt thư thái trên đùi/đệm.
+    - Cân chỉnh động tác bắt tay (`handshake`): cánh tay đưa thẳng về phía trước ở tầm ngực (`y ≈ 1.19m`, `z ≈ 0.39m`), ngón cái hướng lên, lòng bàn tay mở dọc tự nhiên.
+    - Cân chỉnh động tác chỉnh cà vạt (`adjust_tie`): bàn tay chạm đúng vị trí nút thắt cà vạt cổ áo (`Spine2`).
+    - Khắc phục xung đột phím tắt `[F]` và `[B]` trên bàn phím: hợp nhất về `KeyboardController.tsx`, xử lý ngồi ghế / sofa mượt mà và tự động bước ra vùng trống khi đứng dậy không lo kẹt ghế.
 
 ## Content Integrity
 

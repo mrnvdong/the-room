@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useGameStore } from '@/stores/useGameStore';
 import { useI18nStore } from '@/stores/useI18nStore';
 import { useMultiplayerStore } from '@/stores/useMultiplayerStore';
@@ -24,32 +24,6 @@ export const EmoteBar: React.FC = () => {
 
   const identityConfig = VISITOR_IDENTITIES[visitorIdentity] || VISITOR_IDENTITIES.visitor;
   const actions = getActionsForIdentity(visitorIdentity);
-
-  // Keyboard shortcut: Press 'B' to toggle emote panel
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if typing in an input or textarea
-      if (
-        document.activeElement?.tagName === 'INPUT' ||
-        document.activeElement?.tagName === 'TEXTAREA'
-      ) {
-        return;
-      }
-
-      if (e.key === 'b' || e.key === 'B') {
-        e.preventDefault();
-        toggleEmoteBarOpen();
-      } else if (e.key === 'f' || e.key === 'F') {
-        e.preventDefault();
-        toggleLocalSitting();
-      } else if (e.key === 'Escape' && isEmoteBarOpen) {
-        setEmoteBarOpen(false);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [toggleEmoteBarOpen, toggleLocalSitting, isEmoteBarOpen, setEmoteBarOpen]);
 
   const handleActionClick = (id: CharacterActionId) => {
     triggerLocalAction(id);

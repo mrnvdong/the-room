@@ -103,18 +103,27 @@ export const Avatar: React.FC<AvatarProps> = ({ positionRef }) => {
       const distToSofa = Math.hypot(currX - 4.5, currZ - 2.7);
       const distToDeskChair = Math.hypot(currX - -4.7, currZ - -2.0);
 
-      if (distToSofa < 2.0 || isSittingOnSofa) {
+      if (distToSofa < 2.5 || isSittingOnSofa) {
         currentSeatTypeRef.current = 'sofa';
         // Sit centered on sofa cushions, back against sofa backrest, facing forward into room (-Z)
         positionRef.current = [4.5, 0, 2.7];
         currentRotationY.current = Math.PI;
-      } else if (distToDeskChair < 1.8) {
+      } else if (distToDeskChair < 2.5) {
         currentSeatTypeRef.current = 'desk_chair';
         // Sit centered on desk chair, facing forward into desk and ultrawide monitor (-Z)
         positionRef.current = [-4.7, 0, -2.0];
         currentRotationY.current = Math.PI;
-      } else if (!currentSeatTypeRef.current) {
-        currentSeatTypeRef.current = 'floor';
+      } else {
+        // Seat player at the closer primary seat
+        if (currX < 0) {
+          currentSeatTypeRef.current = 'desk_chair';
+          positionRef.current = [-4.7, 0, -2.0];
+          currentRotationY.current = Math.PI;
+        } else {
+          currentSeatTypeRef.current = 'sofa';
+          positionRef.current = [4.5, 0, 2.7];
+          currentRotationY.current = Math.PI;
+        }
       }
 
       groupRef.current.position.set(
