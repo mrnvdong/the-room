@@ -21,7 +21,32 @@
     - **Mystery:** Cúi chào quý tộc 🎩 (`mysterious_bow`), Búng tay ma thuật 🫰 (`snap_fingers`).
     - **Universal:** Vẫy tay chào 👋 (`wave`), Vỗ tay khen ngợi 👏 (`applause`), Ngồi xuống / Đứng lên 🪑 (`sit`), Cười vui vẻ 😄 (`laugh`), Nhảy ăn mừng 🕺 (`dance`).
   - Smart Seating System: Phím `[F]` hoặc tương tác trực tiếp với Ghế bàn làm việc (Ergonomic Desk Chair) hoặc Ghế Sofa (Sectional Sofa) hoặc ngồi thư giãn tại chỗ. Tự động thoát va chạm và cho phép di chuyển mượt mà ngay khi đứng dậy.
-- **Phase 6 — Architectural Visual Overhaul & Stylized 3D Character Aesthetics: PASS**
+- **Phase 7 — Coastal Landscape & Panoramic Terrace Balcony Overhaul (Nha Trang Bay Virtual Tour): PASS**
+  - **Reference Alignment (video1.mp4):** Tái hiện trọn vẹn cảnh quan vịnh biển nhiệt đới Nha Trang rực rỡ nắng vàng và biển xanh ngọc, đồng bộ hoàn hảo với phong cách nhân vật du lịch trải nghiệm.
+  - **Penthouse Panoramic Terrace Balcony (X: -7.0 to -9.6):**
+    - Sàn ban công gỗ Teak ngoài trời cao cấp với các rãnh ghép tinh tế và đèn LED âm sàn hắt sáng ban đêm.
+    - Lan can kính cường lực không khung (frameless tempered glass balustrade) với tay vịn inox mờ tối giản và chốt kẹp sàn inox 304.
+    - Cây xanh nhiệt đới ban công: Chậu sứ trụ tròn trắng trồng cọ Areca nhiều tầng tán lá xòe rộng rủ tự nhiên, chậu cây tán lá nhiệt đới đối xứng.
+    - Ghế tựa tắm nắng thư giãn (Outdoor Lounge Chaise) bọc đệm vải lanh trắng và bàn trà tròn cocktail kèm ly nước giải khát nhiệt đới.
+  - **Nha Trang Bay Ocean Surface:**
+    - Mặt biển vịnh Nha Trang trải rộng với hiệu ứng mặt nước xanh ngọc phản chiếu lấp lánh (turquoise specular shine) và dải sóng bọt trắng dập dềnh.
+    - Du thuyền Catamaran sang trọng màu trắng lướt sóng trên vịnh và thuyền buồm xa xa.
+  - **Iconic Sea Cable Car System (Cáp treo vượt biển Vinpearl Nha Trang):**
+    - Trụ tháp cáp treo đỏ-trắng bằng thép kết cấu vươn lên từ trụ móng bê tông giữa biển.
+    - Hệ thống dây cáp treo chịu lực kéo ngang qua vịnh biển nối ra đảo Hòn Tre.
+    - Các cabin gondola màu đỏ và xanh dương lơ lửng di chuyển trên mặt biển với đèn cảnh báo đỉnh tháp ban đêm.
+  - **Distant Island Ridge (Dãy núi đảo Hòn Tre / Vinpearl):**
+    - Đỉnh núi nhiệt đới xanh mướt uốn lượn nổi bật trên nền biển, kèm kiến trúc lâu đài đỉnh núi phát sáng lung linh về đêm.
+    - Bờ biển cát vàng uốn lượn kèm hàng dừa nhiệt đới nghiêng mình và đại lộ ven biển (phong cách đường Trần Phú).
+  - **Dynamic Weather Presets (Day, Sunset, Rain, Night):**
+    - **Nắng Biển Ban Ngày (Daylight Coastal Bay):** Nắng vàng rực rỡ, trời xanh ngọc bích mây trắng trôi bồng bềnh, biển biếc lung linh.
+    - **Hoàng Hôn Vàng Cam (Golden Sunset Bay):** Ánh hoàng hôn vàng cam ấm áp đổ dài trên mặt vịnh, cáp treo và rặng núi đảo.
+    - **Mưa Biển Sương Mờ (Moody Coastal Mist):** Mưa giăng mờ ảo, mây sương xám bạc bảng lảng ôm lấy sườn núi đảo.
+    - **Đêm Vịnh Biển Lung Linh (Luminous Bay Night):** Đêm trăng sáng vằng vặc trên mặt biển xanh thẫm, đèn thành phố ven biển và đèn cáp treo rực rỡ.
+  - **Lookout Camera & HUD:**
+    - Góc nhìn toàn cảnh vịnh biển (`window.lookout`) cho phép người dùng phóng tầm mắt ngắm trọn cảnh quan từ ban công tầng cao.
+    - Cập nhật song ngữ EN/VI trên bảng điều khiển không gian cửa sổ và thanh trạng thái HUD.
+
   - **SkinnedMesh GLB Character Engine (Option 2):** Thay thế toàn bộ hình khối lego/cylinder thô sơ bằng mô hình 3D thực thụ dạng SkinnedMesh (`/models/xbot.glb`) tích hợp khung xương armature và bộ animation mocap chuẩn quốc tế (`idle`, `walk`, `run`, `agree`, `headShake`, `sad_pose`, `sneak_pose`).
   - **Metaverse VR Avatar Styling (Pixar / Clay Aesthetic):** Tạo hình đồng nhất theo phong cách tham chiếu:
     - Kính VR Headset công nghệ cao với khung trắng, màn hình kính cong Holographic màu xanh Cyan phát quang rực rỡ và vệt phản chiếu gương kính.

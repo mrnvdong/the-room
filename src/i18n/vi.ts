@@ -37,7 +37,7 @@ export const vi: TranslationDictionary = {
 
   interactPrompt: "NHẤN [E] ĐỂ TƯƠNG TÁC",
   tapToInteract: "CHẠM ĐỂ TƯƠNG TÁC",
-  lookoutModeActive: "CHẾ ĐỘ NGẮM TOÀN CẢNH ĐANG BẬT",
+  lookoutModeActive: "CHẾ ĐỘ NGẮM TOÀN CẢNH VỊNH BIỂN",
   exitLookout: "Thoát Góc Nhìn [Esc]",
   relaxingOnSofa: "ĐANG THƯ GIÃN TRÊN SOFA",
   standUp: "Đứng Dậy [WASD / Esc]",
@@ -51,7 +51,7 @@ export const vi: TranslationDictionary = {
   secretDrawerTitle: "Hộc Tủ Câu Đố Demo",
   contactTitle: "Kênh Liên Lạc Trực Tiếp Qua Điện Thoại",
   faqTitle: "Câu Hỏi Thường Gặp (FAQ)",
-  windowTitle: "Cửa Sổ Toàn Cảnh & Điều Khiển Thời Tiết",
+  windowTitle: "Cửa Sổ Vịnh Biển & Thời Tiết",
   coffeeTitle: "Góc Chiêm Nghiệm Cà Phê",
 
   viewProjects: "Dự Án & Sản Phẩm",

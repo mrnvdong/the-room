@@ -69,7 +69,7 @@ export const App: React.FC = () => {
       <Suspense fallback={<LoadingFallback />}>
         <Canvas
           shadows
-          camera={{ fov: 50, near: 0.1, far: 60, position: [0, 1.7, 5.2] }}
+          camera={{ fov: 50, near: 0.1, far: 120, position: [0, 1.7, 5.2] }}
           gl={{
             antialias: true,
             powerPreference: 'default',

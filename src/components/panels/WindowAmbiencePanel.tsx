@@ -1,18 +1,55 @@
 import React from 'react';
 import { useRoomStateStore, WeatherMode } from '@/stores/useRoomStateStore';
+import { useI18nStore } from '@/stores/useI18nStore';
 import { CloudSun, Sun, CloudRain, Moon, Eye, Sparkles } from 'lucide-react';
 
 export const WindowAmbiencePanel: React.FC = () => {
+  const language = useI18nStore((state) => state.language);
   const weatherMode = useRoomStateStore((state) => state.weatherMode);
   const setWeatherMode = useRoomStateStore((state) => state.setWeatherMode);
   const isWindowLookout = useRoomStateStore((state) => state.isWindowLookout);
   const setWindowLookout = useRoomStateStore((state) => state.setWindowLookout);
 
-  const modes: { id: WeatherMode; label: string; icon: React.FC<{ className?: string }>; desc: string }[] = [
-    { id: 'clear', label: 'Daylight Clear', icon: Sun, desc: 'Crisp morning daylight streaming through the glass' },
-    { id: 'sunset', label: 'Golden Sunset', icon: CloudSun, desc: 'Warm amber horizon glow across distant skyscrapers' },
-    { id: 'rain', label: 'Rain Ambience', icon: CloudRain, desc: 'Moody rainy atmosphere with softened room lighting' },
-    { id: 'night', label: 'Midnight Studio', icon: Moon, desc: 'Deep night with neon cyan monitor reflections' },
+  const isVi = language === 'vi';
+
+  const modes: {
+    id: WeatherMode;
+    label: string;
+    icon: React.FC<{ className?: string }>;
+    desc: string;
+  }[] = [
+    {
+      id: 'clear',
+      label: isVi ? 'Nắng Biển Ban Ngày' : 'Daylight Coastal Bay',
+      icon: Sun,
+      desc: isVi
+        ? 'Nắng nhiệt đới rực rỡ, vịnh biển xanh ngọc và đồi núi xanh ngát'
+        : 'Tropical sunshine over turquoise Nha Trang bay, islands & yachts',
+    },
+    {
+      id: 'sunset',
+      label: isVi ? 'Hoàng Hôn Vàng Cam' : 'Golden Sunset Bay',
+      icon: CloudSun,
+      desc: isVi
+        ? 'Ánh hoàng hôn vàng óng rực rỡ phản chiếu mặt vịnh và cáp treo'
+        : 'Warm amber glow across bay waters & Vinpearl cable car',
+    },
+    {
+      id: 'rain',
+      label: isVi ? 'Mưa Biển Sương Mờ' : 'Moody Coastal Mist',
+      icon: CloudRain,
+      desc: isVi
+        ? 'Mưa giăng mờ ảo, mây sương bảng lảng ôm lấy sườn núi đảo'
+        : 'Moody coastal mist and gentle rain over the tropical bay',
+    },
+    {
+      id: 'night',
+      label: isVi ? 'Đêm Vịnh Biển Lung Linh' : 'Luminous Bay Night',
+      icon: Moon,
+      desc: isVi
+        ? 'Ánh đèn thành phố ven biển, cáp treo và các tòa tháp rực rỡ'
+        : 'Sparkling coastal night skyline, moonlit ocean & illuminated towers',
+    },
   ];
 
   return (
@@ -20,13 +57,15 @@ export const WindowAmbiencePanel: React.FC = () => {
       <div className="flex items-center justify-between pb-3 border-b border-white/10">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-sky-400" />
-          <h3 className="font-bold text-base text-white">Panoramic Window & Ambience</h3>
+          <h3 className="font-bold text-base text-white">
+            {isVi ? 'Cảnh Quan Ban Công & Vịnh Biển' : 'Panoramic Bay Terrace & Ambience'}
+          </h3>
         </div>
       </div>
 
       <div className="space-y-2">
         <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-          Atmospheric Lighting Preset:
+          {isVi ? 'Chế độ thời tiết & ánh sáng:' : 'Atmospheric Lighting Preset:'}
         </div>
         <div className="grid grid-cols-2 gap-2.5">
           {modes.map((m) => {
@@ -57,8 +96,12 @@ export const WindowAmbiencePanel: React.FC = () => {
       {/* Look-out Camera Toggle */}
       <div className="pt-2 border-t border-white/10 flex items-center justify-between">
         <div>
-          <div className="text-xs font-bold text-white">Cinematic Look-Out View</div>
-          <div className="text-[11px] text-slate-400">Framed camera viewing the skyline</div>
+          <div className="text-xs font-bold text-white">
+            {isVi ? 'Góc Nhìn Toàn Cảnh Vịnh Biển' : 'Cinematic Look-Out View'}
+          </div>
+          <div className="text-[11px] text-slate-400">
+            {isVi ? 'Phóng tầm mắt ngắm trọn cảnh quan biển đảo' : 'Framed camera viewing the coastal bay'}
+          </div>
         </div>
         <button
           type="button"
@@ -70,7 +113,15 @@ export const WindowAmbiencePanel: React.FC = () => {
           }`}
         >
           <Eye className="w-3.5 h-3.5" />
-          <span>{isWindowLookout ? 'Return to Room' : 'Look Out'}</span>
+          <span>
+            {isWindowLookout
+              ? isVi
+                ? 'Trở về phòng'
+                : 'Return to Room'
+              : isVi
+              ? 'Ngắm vịnh biển'
+              : 'Look Out'}
+          </span>
         </button>
       </div>
     </div>

@@ -37,7 +37,7 @@ export const en: TranslationDictionary = {
 
   interactPrompt: "PRESS [E] TO INTERACT",
   tapToInteract: "TAP TO INTERACT",
-  lookoutModeActive: "SKYLINE LOOKOUT MODE ACTIVE",
+  lookoutModeActive: "COASTAL BAY LOOKOUT MODE ACTIVE",
   exitLookout: "Exit Lookout [Esc]",
   relaxingOnSofa: "RELAXING ON LOUNGE SOFA",
   standUp: "Stand Up [WASD / Esc]",
@@ -51,7 +51,7 @@ export const en: TranslationDictionary = {
   secretDrawerTitle: "Demo Puzzle Drawer",
   contactTitle: "Personal Smartphone Contact Channel",
   faqTitle: "Frequently Asked Questions (FAQ)",
-  windowTitle: "Panoramic Skyline Window & Weather",
+  windowTitle: "Panoramic Coastal Bay Window & Weather",
   coffeeTitle: "Dark Roast Coffee Insights",
 
   viewProjects: "Projects & Builds",
