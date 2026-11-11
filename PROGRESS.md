@@ -47,7 +47,33 @@
     - Góc nhìn toàn cảnh vịnh biển (`window.lookout`) cho phép người dùng phóng tầm mắt ngắm trọn cảnh quan từ ban công tầng cao.
     - Cập nhật song ngữ EN/VI trên bảng điều khiển không gian cửa sổ và thanh trạng thái HUD.
 - **Phase 8 — High-Fidelity Architectural Furniture & Hardware Redesign: PASS**
-  - **Executive Motorized Standing Desk & Tech Setup (DeskSet.tsx):**
+- **Phase 9 — Photorealistic 3D GLB Furniture & Professional Archetype Overhaul (Phương án 1): PASS**
+  - **No More Procedural Lego Blocks:** Replaced all procedural geometric primitives (`boxGeometry`, `cylinderGeometry`) with genuine, photorealistic `.glb` 3D models with PBR materials, textures, and real-life proportions:
+    - **Lounge Area (`LoungeArea.tsx`):**
+      - `sofa_velvet.glb`: Modern luxury velvet sofa with polished brass legs positioned at `[4.5, 0, 2.7]`, facing the lounge and TV (`rotation.y = Math.PI`).
+      - `chair.glb`: High-end designer Sheen armchair positioned at `[2.2, 0, 2.2]`, angled comfortably towards the coffee tables.
+      - `plant.glb`: Organic photorealistic biophilic indoor potted plant with real translucent broad leaves, ceramic pot, and organic potting soil at `[6.2, 0, 4.3]`.
+      - Preserved Italian Carrara marble coffee table, brass accents, and 75" "The Frame" OLED TV with museum mat and wall-wash backlight.
+    - **Workstation Desk Setup (`DeskSet.tsx`):**
+      - `desk.glb`: Genuine 3D executive wooden desk workstation, dual displays, PC tower, keyboard, mouse, books, and chair assembly at `[-4.7, 0, -3.2]`.
+      - Retained interactive architectural task lamp with warm spotlight and secret drawer digital keypad vault lock.
+  - **Authentic Professional Character Archetypes ("Đối tác ra đối tác, nhân viên ra nhân viên"):**
+    - **Partner (Đối tác kinh doanh / Nhà đầu tư):**
+      - High-end dark charcoal / midnight navy tailored business suit.
+      - Crisp white collared dress shirt with French cuffs.
+      - Champagne gold silk necktie with platinum tie clip.
+      - Executive gold wristwatch on left wrist.
+      - Polished Italian dress shoes; removed casual student canvas backpack.
+    - **Recruiter (Nhà tuyển dụng chuyên nghiệp):**
+      - Formal executive navy suit, white dress shirt, ruby red silk necktie with gold clip, Oxford shoes; removed casual canvas backpack.
+    - **Developer / Employee / Friend (Nhân viên kỹ thuật & Bạn hữu):**
+      - Modern tech professional attire (graphite hoodie / developer t-shirt, slate denim, minimalist sneakers, ergonomic tech backpack).
+  - **Kinematics & Pose Bug Fixes:**
+    - **Desk Sitting:** Eliminated broken Euler angles and reversed orientation; character now seamlessly sits facing the desk and monitor (`rotY = Math.PI`), playing the native Mixamo `typing` animation clip with hands naturally on the keyboard and feet flat on the floor.
+    - **Sofa Sitting:** Anatomically correct seated posture with knees bent 90 degrees naturally downward and thighs horizontal, facing forward towards the coffee table and TV.
+    - **Handshake Action (`handshake`):** Corrected right arm kinematics so right arm extends forward naturally with vertical handshake grip and gentle pump, greeting the counterpart properly.
+    - **Tie Adjustment (`adjust_tie`):** Enabled specifically for `recruiter` and `partner` who wear tailored suits with neckties; right hand straightens the physical silk tie knot on the chest.
+  - **Zero Background Server Policy:** Local development server kept completely shut down per user instruction. Production build passes in 13s with zero errors. All 8/8 unit tests pass.
     - Mặt bàn gỗ óc chó nguyên khối (Solid Live-edge Walnut) vát cạnh beveled, chỉ đồng thau inlaid và rãnh đi dây ngầm.
     - Chân bàn nâng hạ điện 2 động cơ (Dual-motor T-frame) kèm bảng điều khiển OLED hiển thị số đo chiều cao (`72.5 cm`), phím nhớ và cổng sạc USB-C.
     - Cột xương cá luồn dây (Vertebrae cable spine) uốn cong mềm mại từ gầm bàn xuống sàn.

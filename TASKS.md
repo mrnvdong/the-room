@@ -5,6 +5,9 @@
 - [x] React/TypeScript/Vite foundation and modular 3D scene.
 - [x] Room, furniture, avatar, keyboard movement, orbit camera, collision, touch controls.
 - [x] Entrance, visitor archetypes, object panels, bilingual UI, and 2D view.
+- [x] Photorealistic 3D GLB furniture integration (luxury velvet sofa, Sheen designer armchair, biophilic indoor plant, executive workstation desk & chair).
+- [x] Professional character archetypes (tailored business suit, silk necktie & gold watch for partner/recruiter; modern tech backpack & apparel for developer).
+- [x] Natural sitting kinematics (native Mixamo typing animation at desk, anatomically correct sofa seating, authentic handshake & tie adjustment).
 - [x] Local development guestbook and WebSocket presence demonstrations.
 - [x] Removed invented contact details and hardcoded client-side admin passwords.
 - [x] Admin UI disabled until server-side authentication exists.

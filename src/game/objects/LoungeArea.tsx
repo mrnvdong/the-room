@@ -1,5 +1,92 @@
-import React from 'react';
+import React, { Suspense, useMemo } from 'react';
 import * as THREE from 'three';
+import { useGLTF } from '@react-three/drei';
+import { getAssetUrl } from '@/config/assets';
+
+const SOFA_URL = getAssetUrl('models/sofa_velvet.glb');
+const CHAIR_URL = getAssetUrl('models/chair.glb');
+const PLANT_URL = getAssetUrl('models/plant.glb');
+
+// Preload models for seamless instant rendering
+try {
+  useGLTF.preload(SOFA_URL);
+  useGLTF.preload(CHAIR_URL);
+  useGLTF.preload(PLANT_URL);
+} catch {
+  // Ignore in SSR/offline
+}
+
+/**
+ * Photorealistic Luxury Velvet & Brass Sofa Model (Khronos GlamVelvetSofa)
+ */
+const LuxuryVelvetSofa: React.FC = () => {
+  const { scene } = useGLTF(SOFA_URL);
+  const clonedScene = useMemo(() => {
+    const clone = scene.clone();
+    clone.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+    return clone;
+  }, [scene]);
+
+  // Position centered at [4.5, 0, 2.7], rotated Math.PI to face coffee table and TV (-Z)
+  return (
+    <group position={[4.5, 0, 2.7]} rotation={[0, Math.PI, 0]}>
+      <primitive object={clonedScene} scale={[1.3, 1.3, 1.3]} />
+    </group>
+  );
+};
+
+/**
+ * High-End Designer Lounge Armchair (Khronos SheenChair)
+ */
+const DesignerLoungeChair: React.FC = () => {
+  const { scene } = useGLTF(CHAIR_URL);
+  const clonedScene = useMemo(() => {
+    const clone = scene.clone();
+    clone.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+    return clone;
+  }, [scene]);
+
+  // Positioned on the left flank of the lounge [2.2, 0, 2.2], angled inwards towards coffee table
+  return (
+    <group position={[2.2, 0, 2.2]} rotation={[0, Math.PI - 0.55, 0]}>
+      <primitive object={clonedScene} scale={[1.35, 1.35, 1.35]} />
+    </group>
+  );
+};
+
+/**
+ * Organic Photorealistic Biophilic Potted Plant (Khronos DiffuseTransmissionPlant)
+ */
+const RealisticIndoorPlant: React.FC = () => {
+  const { scene } = useGLTF(PLANT_URL);
+  const clonedScene = useMemo(() => {
+    const clone = scene.clone();
+    clone.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+    return clone;
+  }, [scene]);
+
+  // Positioned naturally in the lush lounge corner [6.2, 0, 4.3]
+  return (
+    <group position={[6.2, 0, 4.3]} rotation={[0, 0.4, 0]}>
+      <primitive object={clonedScene} scale={[1.0, 1.0, 1.0]} />
+    </group>
+  );
+};
 
 export const LoungeArea: React.FC = () => {
   return (
@@ -8,7 +95,7 @@ export const LoungeArea: React.FC = () => {
           1. DESIGNER HAND-TUFTED GEOMETRIC WOOL RUG
       ========================================================================= */}
       <mesh receiveShadow position={[4.5, 0.006, 2.2]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[4.6, 5.0]} />
+        <planeGeometry args={[4.8, 5.2]} />
         <meshStandardMaterial color="#1a1c23" roughness={0.95} />
       </mesh>
       {/* Sculpted Low-Pile Border Accent Line */}
@@ -18,107 +105,19 @@ export const LoungeArea: React.FC = () => {
       </mesh>
 
       {/* =========================================================================
-          2. ITALIAN CONTEMPORARY BOUCLÉ & VELVET MODULAR SOFA (Sofa cao cấp)
-          Positioned centered at [4.5, 0, 2.7] matching Avatar sofa sitting point
+          2. PHOTOREALISTIC LUXURY VELVET SOFA & DESIGNER ARMCHAIR
       ========================================================================= */}
-      <group position={[4.5, 0, 2.7]}>
-        {/* Recessed Floating Solid Dark Walnut Base Frame */}
-        <mesh castShadow position={[0, 0.05, 0]}>
-          <boxGeometry args={[3.2, 0.1, 1.65]} />
-          <meshStandardMaterial color="#2c1f15" roughness={0.5} />
-        </mesh>
-
-        {/* 6 Tapered Brushed Brass Architectural Cylinder Feet */}
-        {[-1.45, 0, 1.45].map((x) =>
-          [-0.68, 0.68].map((z) => (
-            <mesh key={`${x}_${z}`} position={[x, 0.025, z]}>
-              <cylinderGeometry args={[0.025, 0.018, 0.05, 14]} />
-              <meshStandardMaterial color="#d97706" metalness={0.95} roughness={0.2} />
-            </mesh>
-          ))
-        )}
-
-        {/* Deep Plush Seat Base with French Welt Piping */}
-        <mesh castShadow position={[0, 0.26, 0.04]}>
-          <boxGeometry args={[3.15, 0.22, 1.58]} />
-          <meshStandardMaterial color="#2d3748" roughness={0.75} />
-        </mesh>
-
-        {/* Left & Right Ultra-Plush Bouclé Cushion Slabs */}
-        <group position={[-0.72, 0.42, 0.06]}>
-          <mesh castShadow receiveShadow>
-            <boxGeometry args={[1.44, 0.16, 1.44]} />
-            <meshStandardMaterial color="#334155" roughness={0.7} />
-          </mesh>
-          {/* Subtle cushion crown bevel */}
-          <mesh position={[0, 0.08, 0]}>
-            <boxGeometry args={[1.38, 0.02, 1.38]} />
-            <meshStandardMaterial color="#3b4a60" roughness={0.65} />
-          </mesh>
-        </group>
-
-        <group position={[0.72, 0.42, 0.06]}>
-          <mesh castShadow receiveShadow>
-            <boxGeometry args={[1.44, 0.16, 1.44]} />
-            <meshStandardMaterial color="#334155" roughness={0.7} />
-          </mesh>
-          <mesh position={[0, 0.08, 0]}>
-            <boxGeometry args={[1.38, 0.02, 1.38]} />
-            <meshStandardMaterial color="#3b4a60" roughness={0.65} />
-          </mesh>
-        </group>
-
-        {/* Ergonomically Slanted Low-Profile Backrest */}
-        <mesh castShadow position={[0, 0.65, 0.72]} rotation={[-0.06, 0, 0]}>
-          <boxGeometry args={[3.15, 0.48, 0.26]} />
-          <meshStandardMaterial color="#1e293b" roughness={0.8} />
-        </mesh>
-
-        {/* Soft Rounded Flank Armrests */}
-        <mesh castShadow position={[-1.48, 0.52, 0.06]}>
-          <boxGeometry args={[0.26, 0.36, 1.54]} />
-          <meshStandardMaterial color="#1e293b" roughness={0.8} />
-        </mesh>
-        <mesh castShadow position={[1.48, 0.52, 0.06]}>
-          <boxGeometry args={[0.26, 0.36, 1.54]} />
-          <meshStandardMaterial color="#1e293b" roughness={0.8} />
-        </mesh>
-
-        {/* Curated Designer Pillows & Cashmere Throw */}
-        {/* Ochre Gold Velvet Lumbar Pillow */}
-        <mesh castShadow position={[-0.75, 0.62, 0.52]} rotation={[0.18, 0.22, -0.06]}>
-          <boxGeometry args={[0.46, 0.38, 0.15]} />
-          <meshStandardMaterial color="#d97706" roughness={0.55} />
-        </mesh>
-        {/* Deep Petrol Blue Velvet Pillow */}
-        <mesh castShadow position={[0.78, 0.62, 0.52]} rotation={[0.16, -0.25, 0.05]}>
-          <boxGeometry args={[0.44, 0.36, 0.14]} />
-          <meshStandardMaterial color="#0284c7" roughness={0.55} />
-        </mesh>
-        {/* Cylindrical Bolster Roll Cushion on Left */}
-        <mesh castShadow position={[-1.25, 0.56, 0.08]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.09, 0.09, 0.76, 16]} />
-          <meshStandardMaterial color="#78350f" roughness={0.6} />
-        </mesh>
-        {/* Soft Cashmere Throw Blanket draped over right arm */}
-        <group position={[1.42, 0.52, -0.1]} rotation={[0, 0, -0.1]}>
-          <mesh castShadow>
-            <boxGeometry args={[0.24, 0.12, 0.65]} />
-            <meshStandardMaterial color="#e2e8f0" roughness={0.85} />
-          </mesh>
-          {/* Drooping fringe corner */}
-          <mesh position={[0.1, -0.16, 0]}>
-            <boxGeometry args={[0.04, 0.22, 0.55]} />
-            <meshStandardMaterial color="#cbd5e1" roughness={0.85} />
-          </mesh>
-        </group>
-      </group>
+      <Suspense fallback={null}>
+        <LuxuryVelvetSofa />
+        <DesignerLoungeChair />
+        <RealisticIndoorPlant />
+      </Suspense>
 
       {/* =========================================================================
           3. TIERED NESTING MARBLE & FLUTED TAMBOUR COFFEE TABLES
       ========================================================================= */}
       {/* Primary Table: Italian Carrara Marble Slab & Brass Bevel */}
-      <group position={[4.05, 0, 0.7]}>
+      <group position={[4.05, 0, 0.9]}>
         {/* Polished White Carrara Marble Disc */}
         <mesh castShadow receiveShadow position={[0, 0.38, 0]}>
           <cylinderGeometry args={[0.62, 0.62, 0.035, 32]} />
@@ -173,7 +172,7 @@ export const LoungeArea: React.FC = () => {
       </group>
 
       {/* Secondary Lower Table: Fluted Tambour Oak Base + Smoked Glass Top */}
-      <group position={[5.15, 0, 0.95]}>
+      <group position={[5.15, 0, 1.15]}>
         {/* Tinted Smoked Bronze Glass Top */}
         <mesh castShadow receiveShadow position={[0, 0.3, 0]}>
           <cylinderGeometry args={[0.42, 0.42, 0.025, 32]} />
@@ -239,78 +238,7 @@ export const LoungeArea: React.FC = () => {
       </group>
 
       {/* =========================================================================
-          5. BIOPHILIC LUXURY MONSTERA DELICIOSA IN FLUTED PLANTER
-      ========================================================================= */}
-      <group position={[6.2, 0, 4.8]}>
-        {/* 4-Leg Natural Ash Wood Plant Stand with Brass Foot Caps */}
-        {[-0.18, 0.18].map((x) =>
-          [-0.18, 0.18].map((z) => (
-            <group key={`leg_${x}_${z}`} position={[x, 0.22, z]}>
-              <mesh>
-                <cylinderGeometry args={[0.016, 0.016, 0.44, 12]} />
-                <meshStandardMaterial color="#573a21" roughness={0.6} />
-              </mesh>
-              <mesh position={[0, -0.19, 0]}>
-                <cylinderGeometry args={[0.018, 0.018, 0.06, 12]} />
-                <meshStandardMaterial color="#d97706" metalness={0.9} roughness={0.2} />
-              </mesh>
-            </group>
-          ))
-        )}
-        {/* Cross Bracing */}
-        <mesh position={[0, 0.24, 0]}>
-          <boxGeometry args={[0.4, 0.025, 0.025]} />
-          <meshStandardMaterial color="#573a21" roughness={0.6} />
-        </mesh>
-        <mesh position={[0, 0.24, 0]}>
-          <boxGeometry args={[0.025, 0.025, 0.4]} />
-          <meshStandardMaterial color="#573a21" roughness={0.6} />
-        </mesh>
-
-        {/* Fluted Matte White Ceramic Planter Pot */}
-        <mesh castShadow position={[0, 0.52, 0]}>
-          <cylinderGeometry args={[0.26, 0.22, 0.52, 28]} />
-          <meshStandardMaterial color="#f8fafc" roughness={0.25} />
-        </mesh>
-        {/* Dark Potting Soil with Preserved Moss */}
-        <mesh position={[0, 0.76, 0]}>
-          <cylinderGeometry args={[0.24, 0.24, 0.03, 20]} />
-          <meshStandardMaterial color="#2d1d11" roughness={0.95} />
-        </mesh>
-
-        {/* Multi-tier Sculptural Monstera Foliage */}
-        {[
-          { stemRot: [0.3, 0.2, 0], leafPos: [0.16, 1.05, 0.26], leafRot: [0.6, 0.3, -0.2], size: [0.36, 0.5] },
-          { stemRot: [-0.35, -0.4, 0], leafPos: [-0.22, 1.15, -0.24], leafRot: [-0.5, -0.4, 0.2], size: [0.4, 0.54] },
-          { stemRot: [0.1, 1.2, 0], leafPos: [0.3, 1.28, -0.1], leafRot: [0.3, 1.1, -0.3], size: [0.34, 0.48] },
-          { stemRot: [-0.2, -1.3, 0], leafPos: [-0.3, 1.38, 0.16], leafRot: [-0.4, -1.2, 0.25], size: [0.38, 0.52] },
-          { stemRot: [0.05, 0.1, 0], leafPos: [0, 1.58, 0], leafRot: [0.2, 0.1, 0], size: [0.42, 0.58] },
-        ].map((leaf, idx) => (
-          <group key={idx}>
-            {/* Curved Stem */}
-            <mesh position={[leaf.leafPos[0] * 0.5, 0.77 + (leaf.leafPos[1] - 0.77) * 0.45, leaf.leafPos[2] * 0.5]}>
-              <cylinderGeometry args={[0.012, 0.016, leaf.leafPos[1] - 0.77, 8]} />
-              <meshStandardMaterial color="#166534" roughness={0.6} />
-            </mesh>
-            {/* Fenestrated Glossy Leaf Blade */}
-            <mesh
-              castShadow
-              position={leaf.leafPos as [number, number, number]}
-              rotation={leaf.leafRot as [number, number, number]}
-            >
-              <planeGeometry args={[leaf.size[0], leaf.size[1]]} />
-              <meshStandardMaterial
-                color="#15803d"
-                roughness={0.35}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-          </group>
-        ))}
-      </group>
-
-      {/* =========================================================================
-          6. SMART HI-FI AUDIOPHILE TOWER SPEAKER
+          5. SMART HI-FI AUDIOPHILE TOWER SPEAKER
       ========================================================================= */}
       <group position={[6.4, 0, 0.5]}>
         {/* Cast Aluminum Base Ring with Brass Isolation Spikes */}

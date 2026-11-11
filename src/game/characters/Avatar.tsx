@@ -56,7 +56,7 @@ export const Avatar: React.FC<AvatarProps> = ({ positionRef }) => {
     if (wasSittingRef.current && !isCurrentlySitting) {
       if (currentSeatTypeRef.current === 'desk_chair') {
         // Step back from the desk chair into the open walkway, turn towards the room
-        positionRef.current = [-4.7, 0, -1.0];
+        positionRef.current = [-4.7, 0, -2.1];
         currentRotationY.current = 0;
       } else if (currentSeatTypeRef.current === 'sofa') {
         // Step forward from the sofa into open lounge floor, facing coffee table
@@ -78,7 +78,7 @@ export const Avatar: React.FC<AvatarProps> = ({ positionRef }) => {
       setLocalSitting(false);
       setSittingOnSofa(false);
       if (currentSeatTypeRef.current === 'desk_chair') {
-        positionRef.current = [-4.7, 0, -1.0];
+        positionRef.current = [-4.7, 0, -2.1];
         currentRotationY.current = 0;
       } else if (currentSeatTypeRef.current === 'sofa') {
         positionRef.current = [4.5, 0, 1.4];
@@ -98,30 +98,30 @@ export const Avatar: React.FC<AvatarProps> = ({ positionRef }) => {
     wasSittingRef.current = isCurrentlySitting;
 
     if (isCurrentlySitting) {
-      // Check if near sofa [4.5, 2.7] or desk chair [-4.7, -2.0]
+      // Check if near sofa [4.5, 2.45] or desk chair [-4.7, -3.08]
       const [currX, , currZ] = positionRef.current;
-      const distToSofa = Math.hypot(currX - 4.5, currZ - 2.7);
-      const distToDeskChair = Math.hypot(currX - -4.7, currZ - -2.0);
+      const distToSofa = Math.hypot(currX - 4.5, currZ - 2.45);
+      const distToDeskChair = Math.hypot(currX - -4.7, currZ - -3.08);
 
       if (distToSofa < 2.5 || isSittingOnSofa) {
         currentSeatTypeRef.current = 'sofa';
         // Sit centered on sofa cushions, back against sofa backrest, facing forward into room (-Z)
-        positionRef.current = [4.5, 0, 2.7];
+        positionRef.current = [4.5, 0, 2.45];
         currentRotationY.current = Math.PI;
       } else if (distToDeskChair < 2.5) {
         currentSeatTypeRef.current = 'desk_chair';
-        // Sit centered on desk chair, facing forward into desk and ultrawide monitor (-Z)
-        positionRef.current = [-4.7, 0, -2.0];
+        // Sit centered on desk chair, facing forward into desk and monitor (-Z)
+        positionRef.current = [-4.7, 0, -3.08];
         currentRotationY.current = Math.PI;
       } else {
         // Seat player at the closer primary seat
         if (currX < 0) {
           currentSeatTypeRef.current = 'desk_chair';
-          positionRef.current = [-4.7, 0, -2.0];
+          positionRef.current = [-4.7, 0, -3.08];
           currentRotationY.current = Math.PI;
         } else {
           currentSeatTypeRef.current = 'sofa';
-          positionRef.current = [4.5, 0, 2.7];
+          positionRef.current = [4.5, 0, 2.45];
           currentRotationY.current = Math.PI;
         }
       }

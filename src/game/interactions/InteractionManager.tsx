@@ -78,7 +78,7 @@ export const InteractionManager: React.FC<InteractionManagerProps> = ({ avatarPo
         id: 'desk.chair',
         displayName: 'Ergonomic Desk Chair',
         description: 'Take a seat at the main workstation.',
-        position: [-4.7, 0.5, -2.0],
+        position: [-4.7, 0.5, -3.08],
         radius: 1.8,
         action: 'sit_desk_chair',
         category: 'desk',

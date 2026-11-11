@@ -100,13 +100,13 @@ export const CHARACTER_ACTIONS: Record<CharacterActionId, CharacterActionDef> = 
   // Recruiter
   handshake: {
     id: 'handshake',
-    labelVi: 'Bắt tay phỏng vấn',
+    labelVi: 'Bắt tay đối tác',
     labelEn: 'Executive Handshake',
     emoji: '🤝',
     durationMs: 4000,
-    descriptionVi: 'Bắt tay đối tác trang trọng chuẩn phong thái tuyển dụng',
-    descriptionEn: 'Formal executive handshake welcoming a candidate',
-    forIdentities: ['recruiter'],
+    descriptionVi: 'Bắt tay trang trọng chuẩn phong thái đối tác & tuyển dụng',
+    descriptionEn: 'Formal executive handshake welcoming a partner or candidate',
+    forIdentities: ['recruiter', 'partner'],
   },
   inspect_cv: {
     id: 'inspect_cv',
@@ -134,9 +134,9 @@ export const CHARACTER_ACTIONS: Record<CharacterActionId, CharacterActionDef> = 
     labelEn: 'Straighten Tie',
     emoji: '👔',
     durationMs: 3000,
-    descriptionVi: 'Chỉnh trang cổ áo và cà vạt chuẩn bị phỏng vấn',
-    descriptionEn: 'Straighten executive tie and suit collar',
-    forIdentities: ['recruiter'],
+    descriptionVi: 'Chỉnh trang cà vạt lụa và cổ áo vest chuẩn bị đàm phán',
+    descriptionEn: 'Straighten silk necktie and tailored suit collar',
+    forIdentities: ['recruiter', 'partner'],
   },
 
   // Technical Partner

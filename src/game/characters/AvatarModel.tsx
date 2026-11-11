@@ -25,10 +25,11 @@ const getAssetUrl = (relativePath: string) => {
 };
 
 export const MODEL_URL = getAssetUrl('models/human_avatar.glb');
+export const DRACO_URL = getAssetUrl('draco/');
 
 // Preload the rigged humanoid model
 try {
-  useGLTF.preload(MODEL_URL);
+  useGLTF.preload(MODEL_URL, DRACO_URL);
 } catch {
   // Ignore preload error on offline environments
 }
@@ -104,8 +105,8 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
   const groupRef = useRef<THREE.Group>(null);
   const animTimeRef = useRef(0);
 
-  // Load the 3D rigged SkinnedMesh model
-  const { scene, animations } = useGLTF(MODEL_URL);
+  // Load the 3D rigged SkinnedMesh model with local draco decoder
+  const { scene, animations } = useGLTF(MODEL_URL, DRACO_URL);
 
   const palette = useMemo(() => getIdentityPalette(identity), [identity]);
 
@@ -172,65 +173,69 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
       }
     });
 
-    // Attach Travel Canvas Backpack (Balo) from video1.mp4 to Spine2
+    // Attach Travel Canvas Backpack (Balo) from video1.mp4 to Spine2 for casual & tech roles
     const spine2Bone =
       clone.getObjectByName('Spine2') ||
       clone.getObjectByName('mixamorigSpine2') ||
       clone.getObjectByName('mixamorig:Spine2');
 
+    const leftForeArmBone =
+      clone.getObjectByName('LeftForeArm') ||
+      clone.getObjectByName('mixamorigLeftForeArm') ||
+      clone.getObjectByName('mixamorig:LeftForeArm');
+
     if (spine2Bone) {
-      const backpackRig = new THREE.Group();
-      backpackRig.name = 'travel_backpack_rig';
+      // 1. Tech & Travel Backpack only for developer / friend / explorer / stealth roles
+      if (identity !== 'recruiter' && identity !== 'partner') {
+        const backpackRig = new THREE.Group();
+        backpackRig.name = 'travel_backpack_rig';
 
-      // Attach Travel Canvas Backpack (Balo) from video1.mp4 to Spine2 (Back of character)
-      const bagMat = new THREE.MeshStandardMaterial({
-        color: palette.backpackColor,
-        roughness: 0.85,
-        metalness: 0.08,
-      });
-      const bag = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.38, 0.15), bagMat);
-      bag.position.set(0, -0.05, -0.16); // Mounted on the back
+        const bagMat = new THREE.MeshStandardMaterial({
+          color: palette.backpackColor,
+          roughness: 0.85,
+          metalness: 0.08,
+        });
+        const bag = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.38, 0.15), bagMat);
+        bag.position.set(0, -0.05, -0.16); // Mounted on the back
 
-      // Back Zipper Storage Pocket
-      const pocketMat = new THREE.MeshStandardMaterial({
-        color: palette.pocketColor,
-        roughness: 0.9,
-      });
-      const pocket = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.19, 0.06), pocketMat);
-      pocket.position.set(0, -0.08, -0.25);
+        const pocketMat = new THREE.MeshStandardMaterial({
+          color: palette.pocketColor,
+          roughness: 0.9,
+        });
+        const pocket = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.19, 0.06), pocketMat);
+        pocket.position.set(0, -0.08, -0.25);
 
-      // Top Flap
-      const flapMat = new THREE.MeshStandardMaterial({
-        color: 0x4a2e18,
-        roughness: 0.8,
-      });
-      const topFlap = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.08, 0.14), flapMat);
-      topFlap.position.set(0, 0.13, -0.15);
+        const flapMat = new THREE.MeshStandardMaterial({
+          color: 0x4a2e18,
+          roughness: 0.8,
+        });
+        const topFlap = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.08, 0.14), flapMat);
+        topFlap.position.set(0, 0.13, -0.15);
 
-      // Padded Ergonomic Shoulder Straps over shoulders
-      const strapMat = new THREE.MeshStandardMaterial({ color: 0x2e1e11, roughness: 0.9 });
-      const leftStrap = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.32, 0.015), strapMat);
-      leftStrap.position.set(-0.1, -0.03, -0.02);
-      leftStrap.rotation.x = -0.1;
-      const rightStrap = leftStrap.clone();
-      rightStrap.position.x = 0.1;
+        const strapMat = new THREE.MeshStandardMaterial({ color: 0x2e1e11, roughness: 0.9 });
+        const leftStrap = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.32, 0.015), strapMat);
+        leftStrap.position.set(-0.1, -0.03, -0.02);
+        leftStrap.rotation.x = -0.1;
+        const rightStrap = leftStrap.clone();
+        rightStrap.position.x = 0.1;
 
-      // Side Elastic Water Bottle Pocket
-      const sideHolder = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.04, 0.035, 0.14, 12),
-        new THREE.MeshStandardMaterial({ color: 0x3b4252, roughness: 0.7 })
-      );
-      sideHolder.position.set(0.15, -0.06, -0.15);
+        const sideHolder = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.04, 0.035, 0.14, 12),
+          new THREE.MeshStandardMaterial({ color: 0x3b4252, roughness: 0.7 })
+        );
+        sideHolder.position.set(0.15, -0.06, -0.15);
 
-      backpackRig.add(bag, pocket, topFlap, leftStrap, rightStrap, sideHolder);
-      spine2Bone.add(backpackRig);
+        backpackRig.add(bag, pocket, topFlap, leftStrap, rightStrap, sideHolder);
+        spine2Bone.add(backpackRig);
+      }
 
-      // Crisp Formal Necktie for Recruiter (Front Chest)
-      if (identity === 'recruiter') {
+      // 2. Executive Business Attire: Crisp Collared Shirt & Silk Necktie for Recruiter & Partner
+      if (identity === 'recruiter' || identity === 'partner') {
         const tieRig = new THREE.Group();
-        tieRig.name = 'recruiter_necktie_rig';
+        tieRig.name = 'executive_necktie_rig';
         tieRig.position.set(0, 0.14, 0.11); // Front of upper chest
 
+        // White Italian Dress Shirt Collar
         const collarMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
         const leftCollar = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.035, 0.015), collarMat);
         leftCollar.rotation.z = 0.35;
@@ -240,7 +245,9 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
         rightCollar.position.set(0.04, 0.05, 0.01);
         tieRig.add(leftCollar, rightCollar);
 
-        const tieMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.35, metalness: 0.2 });
+        // Silk Necktie (Ruby red for Recruiter, Champagne Gold / Emerald for Partner)
+        const tieColor = identity === 'recruiter' ? 0xef4444 : 0xd97706;
+        const tieMat = new THREE.MeshStandardMaterial({ color: tieColor, roughness: 0.35, metalness: 0.2 });
         const knot = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.045, 4), tieMat);
         knot.rotation.z = Math.PI;
         knot.position.set(0, 0.02, 0.012);
@@ -250,12 +257,41 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
         tieBody.position.set(0, -0.11, 0.012);
         tieRig.add(tieBody);
 
-        const clipMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.9, roughness: 0.2 });
+        // Metallic Tie Clip
+        const clipColor = identity === 'partner' ? 0xe2e8f0 : 0xfbbf24;
+        const clipMat = new THREE.MeshStandardMaterial({ color: clipColor, metalness: 0.95, roughness: 0.15 });
         const tieClip = new THREE.Mesh(new THREE.BoxGeometry(0.042, 0.01, 0.006), clipMat);
         tieClip.position.set(0.01, -0.07, 0.02);
         tieRig.add(tieClip);
 
         spine2Bone.add(tieRig);
+      }
+
+      // 3. Luxury Timepiece / Smartwatch on Left Wrist for Business Partner
+      if (identity === 'partner' && leftForeArmBone) {
+        const watchRig = new THREE.Group();
+        watchRig.name = 'partner_luxury_watch';
+        watchRig.position.set(0, 0.18, 0);
+
+        // Gold Bezel
+        const bezelMat = new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.95, roughness: 0.2 });
+        const watchCase = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.008, 16), bezelMat);
+        watchCase.rotation.z = Math.PI / 2;
+        watchCase.position.set(0.045, 0, 0);
+
+        // Black Dial
+        const dialMat = new THREE.MeshBasicMaterial({ color: 0x090d14 });
+        const dial = new THREE.Mesh(new THREE.CircleGeometry(0.018, 16), dialMat);
+        dial.rotation.y = Math.PI / 2;
+        dial.position.set(0.05, 0, 0);
+
+        // Leather Strap
+        const strapMat = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.6 });
+        const strap = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.042, 0.022, 16), strapMat);
+        strap.position.set(0, 0, 0);
+
+        watchRig.add(watchCase, dial, strap);
+        leftForeArmBone.add(watchRig);
       }
     }
 
@@ -364,7 +400,7 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
     let targetAction = 'idle';
 
     if (isSitting) {
-      targetAction = ''; // Procedural sitting kinematics handles seated posture
+      targetAction = 'typing'; // Native Mixamo seated typing animation
     } else if (isMoving || (isTurntablePreview && Math.floor(animTimeRef.current) % 6 > 3)) {
       targetAction = isRunning ? 'run' : 'walk';
     } else if (currentAction === 'dance' || currentAction === 'robot_dance') {
@@ -404,19 +440,25 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
 
     // 1. SITTING POSE KINEMATICS (Chair / Sofa)
     if (isSitting) {
-      if (bones.hips) {
-        bones.hips.position.set(0, 0.52, 0.05); // Seated comfortably at chair/cushion height
+      // If native typing animation is active, let animation mixer drive the complete posture
+      if (actions?.typing?.isRunning()) {
+        return;
       }
-      if (bones.leftUpLeg) bones.leftUpLeg.rotation.set(-Math.PI / 2, 0, -3.076);
-      if (bones.rightUpLeg) bones.rightUpLeg.rotation.set(-Math.PI / 2, 0, 3.076);
-      if (bones.leftLeg) bones.leftLeg.rotation.set(-Math.PI / 2, 0, 0);
-      if (bones.rightLeg) bones.rightLeg.rotation.set(-Math.PI / 2, 0, 0);
-      if (bones.leftFoot) bones.leftFoot.rotation.set(1.57, 0, 0);
-      if (bones.rightFoot) bones.rightFoot.rotation.set(1.57, 0, 0);
-      if (bones.leftArm) bones.leftArm.rotation.set(0.8, 0.2, 0.2);
-      if (bones.rightArm) bones.rightArm.rotation.set(0.8, -0.2, -0.2);
-      if (bones.leftForeArm) bones.leftForeArm.rotation.set(0.2, 0.5, 0.8);
-      if (bones.rightForeArm) bones.rightForeArm.rotation.set(0.2, -0.5, -0.8);
+
+      // Anatomically correct seated posture (knees bent 90 degrees naturally down, thighs horizontal forward)
+      if (bones.hips) {
+        bones.hips.position.set(0, 0.52, 0.05);
+      }
+      if (bones.leftUpLeg) bones.leftUpLeg.rotation.set(-1.50, -0.02, 0.08);
+      if (bones.rightUpLeg) bones.rightUpLeg.rotation.set(-1.50, -0.03, -0.08);
+      if (bones.leftLeg) bones.leftLeg.rotation.set(1.57, 0, 0);
+      if (bones.rightLeg) bones.rightLeg.rotation.set(1.57, 0, 0);
+      if (bones.leftFoot) bones.leftFoot.rotation.set(-0.07, 0, 0);
+      if (bones.rightFoot) bones.rightFoot.rotation.set(-0.07, 0, 0);
+      if (bones.leftArm) bones.leftArm.rotation.set(0.6, 0.2, 0.2);
+      if (bones.rightArm) bones.rightArm.rotation.set(0.6, -0.2, -0.2);
+      if (bones.leftForeArm) bones.leftForeArm.rotation.set(0.4, 0.3, 0.4);
+      if (bones.rightForeArm) bones.rightForeArm.rotation.set(0.4, -0.3, -0.4);
       return;
     }
 
@@ -432,11 +474,13 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
         }
 
         case 'handshake': {
-          if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
-          if (bones.rightArm) bones.rightArm.rotation.set(1.1, -0.4, -1.0);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-0.2, 0.9, 0.2);
-          if (bones.rightHand) bones.rightHand.rotation.set(-0.1, 0.5, 0.3 + Math.sin(t * 10) * 0.06);
-          if (bones.spine) bones.spine.rotation.x = 0.06;
+          if (bones.leftArm) bones.leftArm.rotation.set(0.8, 0.1, -0.1);
+          // Right arm extends forward naturally towards counterpart with vertical hand grip
+          if (bones.rightArm) bones.rightArm.rotation.set(-0.35, -0.6, 1.25);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(0, 0.45, 0.25);
+          if (bones.rightHand) bones.rightHand.rotation.set(0, 0.1, Math.sin(t * 8) * 0.08);
+          if (bones.spine) bones.spine.rotation.x = 0.08;
+          if (bones.head) bones.head.rotation.x = -0.05;
           break;
         }
 
@@ -486,11 +530,12 @@ const GLBAvatar: React.FC<AvatarModelProps> = ({
         }
 
         case 'adjust_tie': {
-          if (bones.leftArm) bones.leftArm.rotation.set(0.998, 0.019, -0.144);
-          const adj = Math.sin(t * 8) * 0.04;
-          if (bones.rightArm) bones.rightArm.rotation.set(-0.5 + adj, -0.4, -1.5);
-          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-1.3, 0.6, -1.5);
-          if (bones.head) bones.head.rotation.x = 0.15;
+          if (bones.leftArm) bones.leftArm.rotation.set(0.8, 0.1, -0.1);
+          const adj = Math.sin(t * 6) * 0.03;
+          // Right hand rises to upper chest to straighten silk necktie knot
+          if (bones.rightArm) bones.rightArm.rotation.set(-0.4 + adj, -0.3, -1.35);
+          if (bones.rightForeArm) bones.rightForeArm.rotation.set(-1.1, 0.5, -1.35);
+          if (bones.head) bones.head.rotation.x = 0.12;
           break;
         }
 
