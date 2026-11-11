@@ -46,6 +46,44 @@
   - **Lookout Camera & HUD:**
     - Góc nhìn toàn cảnh vịnh biển (`window.lookout`) cho phép người dùng phóng tầm mắt ngắm trọn cảnh quan từ ban công tầng cao.
     - Cập nhật song ngữ EN/VI trên bảng điều khiển không gian cửa sổ và thanh trạng thái HUD.
+- **Phase 8 — High-Fidelity Architectural Furniture & Hardware Redesign: PASS**
+  - **Executive Motorized Standing Desk & Tech Setup (DeskSet.tsx):**
+    - Mặt bàn gỗ óc chó nguyên khối (Solid Live-edge Walnut) vát cạnh beveled, chỉ đồng thau inlaid và rãnh đi dây ngầm.
+    - Chân bàn nâng hạ điện 2 động cơ (Dual-motor T-frame) kèm bảng điều khiển OLED hiển thị số đo chiều cao (`72.5 cm`), phím nhớ và cổng sạc USB-C.
+    - Cột xương cá luồn dây (Vertebrae cable spine) uốn cong mềm mại từ gầm bàn xuống sàn.
+    - Màn hình cong siêu rộng Flagship 49" 1500R Dual-QHD 3 khúc bo cong góc nhìn, webcam 4K có thanh gạt bảo mật và đèn nền ARGB bias lighting.
+    - Màn hình phụ dựng đứng 27" hiển thị dashboard vi mô hệ thống và mã nguồn.
+    - Thùng máy tính Gaming / Workstation mặt kính cường lực phô diễn card đồ họa RTX quạt 3 cánh, tản nhiệt nước AIO có màn hình LCD bơm, RAM RGB và quạt hút trước phát quang.
+    - Bàn phím cơ nhôm CNC 75% phím gõ công thái học kèm núm xoay âm lượng mạ vàng và dây cáp xoắn bọc dù Aviator GX16.
+    - Chuột công thái học có đệm tì ngón cái và con lăn kim loại knurled.
+    - Đèn bàn kiến trúc sư tay đòn kép khớp nối đồng thau và lò xo cân bằng.
+    - Giá treo tai nghe gỗ óc chó & đồng thau đỡ tai nghe studio chụp tai cao cấp.
+  - **Herman Miller Embody / Aeron Style Ergonomic Office Chair:**
+    - Chân sao 5 cánh nhôm đúc đánh bóng với 5 cụm bánh xe lăn kép (dual-wheel casters).
+    - Trụ nâng thủy lực chịu tải cao, hộp cơ cấu ngả lưng và cần gạt nâng hạ chiều cao.
+    - Đệm ngồi dạng thác nước (waterfall edge) giảm áp lực đùi, bọc vải lưới thoáng khí.
+    - Khung xương sống ma trận (matrix spine) linh hoạt ôm trọn cột sống, đệm đỡ thắt lưng động (dynamic lumbar support) và tựa đầu lưới 2 thanh trụ kim loại.
+    - Tì tay 3D đa hướng có đệm bọc da mềm.
+  - **Luxury Italian Modular Sectional Sofa & Tiered Coffee Tables (LoungeArea.tsx):**
+    - Sofa góc nỉ bouclé cao cấp với đệm ngồi dày viền chỉ Pháp, chân trụ đồng thau vát côn và đệm tựa lưng êm ái.
+    - Gối tựa nhung màu vàng mù tạt (ochre), xanh biển đậm (petrol blue), gối tròn bolster và chăn cashmere vắt góc.
+    - Bàn trà lồng đôi: Bàn chính mặt đá cẩm thạch trắng Carrara vân mây bo viền tròn chỉ đồng thau, chân tripod thép đen bọc ống đồng; bàn phụ gỗ nan sọc (fluted tambour) kết hợp mặt kính màu khói.
+    - Ly cà phê gốm thủ công kèm đĩa lót, sách kiến trúc bìa cứng mở trang nghệ thuật.
+    - TV khung tranh OLED "The Frame" 75" viền gỗ sồi tự nhiên kèm soundbar vải nỉ thanh mảnh.
+    - Cây xanh nội thất Monstera Deliciosa thân cong tự nhiên nhiều tầng lá bản to xẻ răng cưa đặt trên đôn gỗ chân đồng.
+    - Loa tháp thông minh Hi-Fi vải dệt âm học cao cấp với vòng LED Cyan đỉnh tháp.
+  - **Architectural Curated Library Bookshelf (Bookshelf.tsx):**
+    - Kệ sách bất đối xứng cao cấp với dải đèn LED hắt từng tầng, các bộ sưu tập sách gáy vải ép nhũ vàng và sách nghiêng chặn bằng chặn sách đồng thau.
+    - Tượng nghệ thuật dải Möbius bằng đồng trên bệ đá cẩm thạch trắng.
+    - Đồng hồ cát thủy tinh cổ điển với cát vàng chảy tự nhiên.
+    - Bình gốm đất nung cắm cành thực vật khô tối giản và khung bằng chứng nhận thiết kế mạ vàng.
+    - Chậu cây trầu bà (Pothos) trên tầng cao rủ những nhánh dây leo xanh tươi rủ xuống qua 2 tầng kệ.
+  - **Enterprise 42U Server Rack (ServerRack.tsx):**
+    - Thùng tủ rack thép đen 42U cửa kính màu khói viền kim loại đục lỗ thoáng khí.
+    - Hệ thống patch panel với các bó dây mạng RJ45 nhiều màu (xanh dương, vàng, xanh lá) uốn cong chuyên nghiệp.
+    - Các khay máy chủ 2U với lẫy tháo lắp ổ cứng hot-swap và ma trận đèn LED tín hiệu nhấp nháy.
+    - Màn hình telemetry KVM tay đòn kim loại hiển thị thông số Kubernetes và độ trễ mạng theo thời gian thực.
+
 
   - **SkinnedMesh GLB Character Engine (Option 2):** Thay thế toàn bộ hình khối lego/cylinder thô sơ bằng mô hình 3D thực thụ dạng SkinnedMesh (`/models/xbot.glb`) tích hợp khung xương armature và bộ animation mocap chuẩn quốc tế (`idle`, `walk`, `run`, `agree`, `headShake`, `sad_pose`, `sneak_pose`).
   - **Metaverse VR Avatar Styling (Pixar / Clay Aesthetic):** Tạo hình đồng nhất theo phong cách tham chiếu:
